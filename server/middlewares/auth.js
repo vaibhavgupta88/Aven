@@ -23,8 +23,13 @@ export const auth = async (req, res, next) => {
       }
     }
 
-    // Default guest fallback
+    // Fallback: check x-user-id header or body/query
     if (!userId) {
+      userId = req.headers["x-user-id"] || req.body?.userId || req.query?.userId;
+    }
+
+    // Default guest fallback
+    if (!userId || userId === "undefined" || userId === "null") {
       userId = "user_demo_guest";
     }
 

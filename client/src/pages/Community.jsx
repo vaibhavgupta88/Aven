@@ -1,6 +1,6 @@
 import { useAuth, useUser } from "@clerk/clerk-react";
 import { useCallback, useEffect, useState } from "react";
-import { Heart, Users, Sparkles } from "lucide-react";
+import { Heart, Users, Sparkles, Download } from "lucide-react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -15,9 +15,15 @@ const Community = () => {
     try {
       setLoading(true);
 
-      const token = await getToken();
+      let token = "";
+      try {
+        token = await getToken();
+      } catch (tErr) {
+        console.warn("Token fetch note:", tErr);
+      }
+
       const { data } = await axios.get("/api/user/get-published-creations", {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
 
       if (data.success) {
@@ -31,6 +37,29 @@ const Community = () => {
 
     setLoading(false);
   }, [getToken]);
+
+  const handleDownloadImage = async (url, prompt) => {
+    try {
+      toast.loading("Downloading image...", { id: "download-toast" });
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      const cleanPrompt = (prompt || "aven-community-art")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "-")
+        .substring(0, 30);
+      link.download = `${cleanPrompt}-${Date.now()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success("Image downloaded successfully!", { id: "download-toast" });
+    } catch (error) {
+      console.error("Download error:", error);
+      window.open(url, "_blank");
+      toast.dismiss("download-toast");
+    }
+  };
 
   const imageLikeToggle = async (id) => {
     if (!user) {
@@ -54,12 +83,18 @@ const Community = () => {
         })
       );
 
-      const token = await getToken();
+      let token = "";
+      try {
+        token = await getToken();
+      } catch (tErr) {
+        console.warn("Token fetch note:", tErr);
+      }
+
       const { data } = await axios.post(
         "/api/user/toggle-like-creation",
         { id },
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
         }
       );
 
@@ -77,10 +112,8 @@ const Community = () => {
   };
 
   useEffect(() => {
-    if (user) {
-      fetchCreations();
-    }
-  }, [user, fetchCreations]);
+    fetchCreations();
+  }, [fetchCreations]);
 
   if (loading) {
     return (
@@ -123,33 +156,50 @@ const Community = () => {
               return (
                 <div
                   key={creation.id || index}
-                  className="relative group inline-block w-full sm:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)] overflow-hidden rounded-xl"
+                  className="relative group inline-block w-full sm:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)] overflow-hidden rounded-xl bg-black/30 border border-white/10"
                 >
                   <img
                     src={creation.content}
                     alt={creation.prompt}
-                    className="w-full h-64 object-cover rounded-xl shadow-sm border border-white/10 transition-transform duration-300 group-hover:scale-105"
+                    className="w-full h-64 object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
                   />
 
-                  {/* High Contrast Hover Overlay */}
+                  {/* High Contrast Bottom Hover Overlay */}
                   <div className="absolute inset-0 flex gap-2 items-end justify-between p-4 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl community-card-overlay">
-                    <p className="text-sm line-clamp-2 font-medium !text-white drop-shadow-md">
+                    <p className="text-sm line-clamp-2 font-medium !text-white drop-shadow-md pr-2">
                       {creation.prompt ? creation.prompt.replace(/^Generate an image of /i, "").replace(/^Write an article about /i, "") : ""}
                     </p>
-                    <div className="flex gap-1.5 items-center bg-black/80 px-3 py-1.5 rounded-full backdrop-blur-md border border-white/20 ml-auto shrink-0 shadow-lg">
-                      <span className="text-xs font-semibold !text-white" style={{ color: "#ffffff" }}>
-                        {likesArray.length}
-                      </span>
-                      <Heart
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      {/* Download Button in footer overlay */}
+                      <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          imageLikeToggle(creation.id);
+                          handleDownloadImage(creation.content, creation.prompt);
                         }}
-                        className={`w-4 h-4 hover:scale-110 transition cursor-pointer ${
-                          isLiked ? "fill-[#FF4D5E] text-[#FF4D5E]" : "!text-white"
-                        }`}
-                        style={!isLiked ? { color: "#ffffff" } : {}}
-                      />
+                        title="Download Image"
+                        aria-label="Download Image"
+                        className="p-1.5 rounded-full bg-black/80 hover:bg-[#FF4D5E] border border-white/20 text-white transition hover:scale-110 cursor-pointer shadow-lg"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                      </button>
+
+                      {/* Like Badge & Heart */}
+                      <div className="flex gap-1.5 items-center bg-black/80 px-3 py-1.5 rounded-full backdrop-blur-md border border-white/20 shadow-lg">
+                        <span className="text-xs font-semibold !text-white" style={{ color: "#ffffff" }}>
+                          {likesArray.length}
+                        </span>
+                        <Heart
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            imageLikeToggle(creation.id);
+                          }}
+                          className={`w-4 h-4 hover:scale-110 transition cursor-pointer ${
+                            isLiked ? "fill-[#FF4D5E] text-[#FF4D5E]" : "!text-white"
+                          }`}
+                          style={!isLiked ? { color: "#ffffff" } : {}}
+                        />
+                      </div>
                     </div>
                   </div>
 

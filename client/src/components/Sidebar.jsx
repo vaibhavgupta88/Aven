@@ -12,19 +12,21 @@ import {
   Sun,
   Moon,
   Zap,
+  Lock,
+  Crown,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 
 const navItems = [
-  { to: "/ai", label: "Dashboard", Icon: House },
-  { to: "/ai/write-article", label: "Write Article", Icon: SquarePen },
-  { to: "/ai/blog-titles", label: "Blog Titles", Icon: Hash },
-  { to: "/ai/generate-images", label: "Generate Images", Icon: Image },
-  { to: "/ai/remove-background", label: "Remove Background", Icon: Eraser },
-  { to: "/ai/remove-object", label: "Remove Object", Icon: Scissors },
-  { to: "/ai/review-resume", label: "Review Resume", Icon: FileText },
-  { to: "/ai/community", label: "Community", Icon: Users },
+  { to: "/ai", label: "Dashboard", Icon: House, isPro: false },
+  { to: "/ai/write-article", label: "Write Article", Icon: SquarePen, isPro: false },
+  { to: "/ai/blog-titles", label: "Blog Titles", Icon: Hash, isPro: false },
+  { to: "/ai/generate-images", label: "Generate Images", Icon: Image, isPro: false },
+  { to: "/ai/remove-background", label: "Remove Background", Icon: Eraser, isPro: true },
+  { to: "/ai/remove-object", label: "Remove Object", Icon: Scissors, isPro: true },
+  { to: "/ai/review-resume", label: "Review Resume", Icon: FileText, isPro: true },
+  { to: "/ai/community", label: "Community", Icon: Users, isPro: false },
 ];
 
 const Sidebar = ({ sidebar, setSidebar }) => {
@@ -93,7 +95,7 @@ const Sidebar = ({ sidebar, setSidebar }) => {
                 end={item.to === "/ai"}
                 onClick={() => setSidebar(false)}
                 className={({ isActive }) =>
-                  `px-3.5 py-2.5 flex items-center gap-3 rounded-xl transition-all ${
+                  `px-3.5 py-2.5 flex items-center justify-between rounded-xl transition-all ${
                     isActive
                       ? "bg-white text-black font-bold shadow-sm"
                       : "text-gray-400 hover:text-white hover:bg-white/5"
@@ -102,8 +104,31 @@ const Sidebar = ({ sidebar, setSidebar }) => {
               >
                 {({ isActive }) => (
                   <>
-                    <ItemIcon className={`w-4 h-4 ${isActive ? "text-black" : "text-gray-400"}`} />
-                    <span>{item.label}</span>
+                    <div className="flex items-center gap-3">
+                      <ItemIcon className={`w-4 h-4 ${isActive ? "text-black" : "text-gray-400"}`} />
+                      <span>{item.label}</span>
+                    </div>
+
+                    {item.isPro && (
+                      <div className="flex items-center gap-1">
+                        <span
+                          className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-md tracking-wider transition ${
+                            isActive
+                              ? "bg-[#FF4D5E] text-white"
+                              : "bg-[#FF4D5E]/20 text-[#FF4D5E] border border-[#FF4D5E]/40"
+                          }`}
+                        >
+                          PRO
+                        </span>
+                        {!isPremium && (
+                          <Lock
+                            className={`w-3 h-3 ${
+                              isActive ? "text-gray-700" : "text-gray-500"
+                            }`}
+                          />
+                        )}
+                      </div>
+                    )}
                   </>
                 )}
               </NavLink>

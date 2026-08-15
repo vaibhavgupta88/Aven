@@ -1,10 +1,11 @@
 import { Edit, Sparkles } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import toast from "react-hot-toast";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { saveLocalCreation } from "../lib/creationsStorage";
 
 const WriteArticle = () => {
   const articleLength = [
@@ -19,6 +20,7 @@ const WriteArticle = () => {
   const [content, setContent] = useState("");
 
   const { getToken } = useAuth();
+  const { user } = useUser();
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
@@ -33,29 +35,27 @@ const WriteArticle = () => {
         console.warn("Token fetch note:", tokenErr);
       }
 
+      const headers = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      if (user?.id) headers["x-user-id"] = user.id;
+
       const { data } = await axios.post(
         "/api/ai/generate-article",
         { prompt, length: selectedLength.length },
-        {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        }
+        { headers }
       );
 
       if (data.success) {
         setContent(data.content);
-        try {
-          const newCreation = {
-            id: `creation_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-            prompt,
-            content: data.content,
-            type: "article",
-            created_at: new Date().toISOString(),
-          };
-          const existing = JSON.parse(localStorage.getItem("aven_local_creations") || "[]");
-          localStorage.setItem("aven_local_creations", JSON.stringify([newCreation, ...existing]));
-        } catch (e) {
-          console.warn("LocalStorage save note:", e);
-        }
+        const newCreation = {
+          id: `creation_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+          user_id: user?.id || "guest",
+          prompt,
+          content: data.content,
+          type: "article",
+          created_at: new Date().toISOString(),
+        };
+        saveLocalCreation(user?.id, newCreation);
       } else {
         toast.error(data.message);
       }

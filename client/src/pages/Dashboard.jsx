@@ -2,22 +2,28 @@ import { useCallback, useEffect, useState } from "react";
 import { Gem, Sparkles, FolderKanban } from "lucide-react";
 import { useAuth, useUser } from "@clerk/clerk-react";
 import CreationItem from "../components/CreationItem";
+import {
+  getLocalCreations,
+  setLocalCreations,
+  removeLocalCreation,
+} from "../lib/creationsStorage";
 import axios from "axios";
-import toast from "react-hot-toast";
-
-const LOCAL_STORAGE_KEY = "aven_local_creations";
 
 const Dashboard = () => {
   const [creations, setCreations] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const { getToken } = useAuth();
+
+  const userId = user?.id || (isLoaded ? "guest" : "");
 
   const isPremium =
     user?.publicMetadata?.plan === "premium" ||
     user?.privateMetadata?.plan === "premium";
 
   const getDashboardData = useCallback(async () => {
+    if (!isLoaded) return;
+
     let serverItems = [];
     try {
       let token = "";
@@ -27,8 +33,12 @@ const Dashboard = () => {
         console.warn("Token fetch note:", tErr);
       }
 
+      const headers = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      if (user?.id) headers["x-user-id"] = user.id;
+
       const { data } = await axios.get("/api/user/get-user-creations", {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        headers,
       });
 
       if (data.success && Array.isArray(data.creations)) {
@@ -38,16 +48,8 @@ const Dashboard = () => {
       console.warn("Dashboard fetch note:", error.message);
     }
 
-    // Read stored creations from browser localStorage
-    let localItems = [];
-    try {
-      const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (stored) {
-        localItems = JSON.parse(stored);
-      }
-    } catch (e) {
-      console.warn("Local storage read note:", e);
-    }
+    // Read stored creations scoped to the current user (with auto-claim for guest items)
+    const localItems = getLocalCreations(userId || "guest");
 
     // Combine server + local items deduplicated by id
     const combinedMap = new Map();
@@ -62,29 +64,23 @@ const Dashboard = () => {
     );
 
     setCreations(finalCreations);
-
-    // Sync merged items back to localStorage for offline / sign-out persistence
-    try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(finalCreations));
-    } catch (e) {
-      console.warn("Local storage write note:", e);
+    if (userId) {
+      setLocalCreations(userId, finalCreations);
     }
-
     setLoading(false);
-  }, [getToken]);
+  }, [getToken, userId, isLoaded, user?.id]);
 
   useEffect(() => {
-    getDashboardData();
-  }, [getDashboardData]);
+    if (isLoaded) {
+      setLoading(true);
+      getDashboardData();
+    }
+  }, [getDashboardData, isLoaded]);
 
   const handleDelete = (id) => {
     setCreations((prev) => {
       const updated = prev.filter((c) => c.id !== id);
-      try {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
-      } catch (e) {
-        console.warn("Local storage update note:", e);
-      }
+      removeLocalCreation(userId, id);
       return updated;
     });
   };

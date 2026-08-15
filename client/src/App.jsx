@@ -18,6 +18,7 @@ const App = () => {
       <Toaster position="top-right" />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/pricing" element={<Home />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/ai" element={<Layout />}>
           <Route index element={<Dashboard />} />

@@ -3,6 +3,7 @@ import {
   getCreationsByUser,
   getAllCreations,
   getPublishedMemoryCreations,
+  updateCreationLikes,
   removeCreation,
 } from "../configs/creationsStore.js";
 
@@ -55,13 +56,15 @@ export const getPublishedCreations = async (req, res) => {
     const combinedMap = new Map();
     [...(Array.isArray(dbCreations) ? dbCreations : []), ...memoryCreations].forEach(
       (item) => {
-        if (item.publish === true) {
+        if (item.publish === true || item.publish === "true" || item.publish === 1) {
           combinedMap.set(item.id, item);
         }
       }
     );
 
-    const creations = Array.from(combinedMap.values());
+    const creations = Array.from(combinedMap.values()).sort(
+      (a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0)
+    );
     res.json({ success: true, creations });
   } catch (error) {
     res.json({ success: false, message: error.message });
@@ -75,8 +78,8 @@ export const toggleLikeCreation = async (req, res) => {
 
     let creation = null;
     try {
-      const [res] = await sql`SELECT * FROM creations WHERE id = ${id}`;
-      creation = res;
+      const [dbRow] = await sql`SELECT * FROM creations WHERE id = ${id}`;
+      creation = dbRow;
     } catch (e) {
       console.warn("DB query note:", e.message);
     }
@@ -108,7 +111,9 @@ export const toggleLikeCreation = async (req, res) => {
     } catch (e) {
       console.warn("DB update note:", e.message);
     }
+
     creation.likes = updatedLikes;
+    updateCreationLikes(id, updatedLikes);
 
     res.json({ success: true, message, likes: updatedLikes });
   } catch (error) {

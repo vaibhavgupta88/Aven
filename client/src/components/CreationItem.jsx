@@ -49,11 +49,18 @@ const CreationItem = ({ item, onDelete }) => {
 
     try {
       setDeleting(true);
-      const token = await getToken();
+
+      let token = "";
+      try {
+        token = await getToken();
+      } catch (tErr) {
+        console.warn("Token fetch note:", tErr);
+      }
+
       const { data } = await axios.post(
         "/api/user/delete-creation",
         { id: item.id },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
       );
 
       if (data.success) {

@@ -4,7 +4,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
+import { saveLocalCreation } from "../lib/creationsStorage";
 
 const BlogTitles = () => {
   const blogCategories = [
@@ -24,6 +25,7 @@ const BlogTitles = () => {
   const [content, setContent] = useState("");
 
   const { getToken } = useAuth();
+  const { user } = useUser();
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
@@ -38,16 +40,27 @@ const BlogTitles = () => {
         console.warn("Token fetch note:", tokenErr);
       }
 
+      const headers = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      if (user?.id) headers["x-user-id"] = user.id;
+
       const { data } = await axios.post(
         "/api/ai/generate-blog-title",
-        { prompt },
-        {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        }
+        { prompt, category: selectedCategory },
+        { headers }
       );
 
       if (data.success) {
         setContent(data.content);
+        const newCreation = {
+          id: `creation_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+          user_id: user?.id || "guest",
+          prompt: `Blog titles for ${prompt}`,
+          content: data.content,
+          type: "blog-title",
+          created_at: new Date().toISOString(),
+        };
+        saveLocalCreation(user?.id, newCreation);
       } else {
         toast.error(data.message);
       }

@@ -5,19 +5,7 @@ import axios from "axios";
 // - On local mobile / Wi-Fi dev: http://<local-ip>:3000
 // - On deployed Vercel production: "" (relative URL hitting current active deployment)
 export const getApiBaseUrl = () => {
-  const envUrl = import.meta.env.VITE_BASE_URL;
-
-  // 1. If VITE_BASE_URL is explicitly set to a valid external URL, use it
-  if (
-    envUrl &&
-    envUrl.trim() !== "" &&
-    !envUrl.includes("localhost") &&
-    !envUrl.includes("127.0.0.1")
-  ) {
-    return envUrl.trim().replace(/\/+$/, "");
-  }
-
-  // 2. Local network or desktop dev detection
+  // 1. Local desktop or local network development takes highest priority
   if (typeof window !== "undefined" && window.location.hostname) {
     const host = window.location.hostname;
 
@@ -31,6 +19,17 @@ export const getApiBaseUrl = () => {
     if (isLocalNetworkIp) {
       return `http://${host}:3000`;
     }
+  }
+
+  // 2. If VITE_BASE_URL is explicitly set for external production deployment
+  const envUrl = import.meta.env.VITE_BASE_URL;
+  if (
+    envUrl &&
+    envUrl.trim() !== "" &&
+    !envUrl.includes("localhost") &&
+    !envUrl.includes("127.0.0.1")
+  ) {
+    return envUrl.trim().replace(/\/+$/, "");
   }
 
   // 3. Fallback for deployed production (relative URL hits active deployment)

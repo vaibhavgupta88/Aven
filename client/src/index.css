@@ -354,13 +354,23 @@ footer a[aria-label] svg,
   line-height: 1.6 !important;
 }
 
-.reset-tw ul, .reset-tw ol {
+.reset-tw ul {
+  list-style-type: disc !important;
   margin-left: 1.25rem !important;
+  padding-left: 0.5rem !important;
+  margin-bottom: 0.85rem !important;
+}
+
+.reset-tw ol {
+  list-style-type: decimal !important;
+  margin-left: 1.25rem !important;
+  padding-left: 0.5rem !important;
   margin-bottom: 0.85rem !important;
 }
 
 .reset-tw li {
-  margin-bottom: 0.35rem !important;
+  margin-bottom: 0.5rem !important;
+  line-height: 1.6 !important;
 }
 
 .reset-tw code {

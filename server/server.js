@@ -1,11 +1,19 @@
 import express from "express";
 import cors from "cors";
-import "dotenv/config";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 import { clerkMiddleware } from "@clerk/express";
 import aiRouter from "./routes/aiRoutes.js";
 import connectCloudinary from "./configs/cloudinary.js";
 import userRouter from "./routes/userRoutes.js";
 import stripeRouter from "./routes/stripeRoutes.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, ".env") });
+dotenv.config();
 
 const app = express();
 
@@ -19,7 +27,16 @@ app.use(
   cors({
     origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "x-api-key"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "x-api-key",
+      "x-user-id",
+      "X-User-Id",
+      "Accept",
+      "Origin",
+      "X-Requested-With",
+    ],
   })
 );
 
@@ -41,24 +58,56 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json());
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
 
 // Clerk authentication middleware
 try {
-  app.use(clerkMiddleware());
+  app.use(
+    clerkMiddleware({
+      publishableKey:
+        process.env.CLERK_PUBLISHABLE_KEY ||
+        "pk_test_bmljZS1zbmFwcGVyLTQ2LmNsZXJrLmFjY291bnRzLmRldiQ",
+      secretKey: process.env.CLERK_SECRET_KEY,
+    })
+  );
 } catch (err) {
   console.warn("Clerk middleware warning:", err.message);
 }
 
-app.get("/", (req, res) => res.send("Server is Live!"));
-app.get("/api", (req, res) => res.send("Server API is Live!"));
+import fs from "fs";
 
-// Multi-path API router mounts (matches both /api/ai and /ai, etc.)
-app.use(["/api/stripe", "/stripe"], stripeRouter);
-app.use(["/api/ai", "/ai"], aiRouter);
-app.use(["/api/user", "/user"], userRouter);
+// Multi-path API router mounts
+app.use("/api/stripe", stripeRouter);
+app.use("/api/ai", aiRouter);
+app.use("/api/user", userRouter);
 
-// Global Catch-all to prevent 404 status code (no body)
+app.get("/api", (req, res) => res.json({ success: true, message: "Server API is Live!" }));
+
+// Serve static client build if available
+const clientDistPath = path.resolve(__dirname, "../client/dist");
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+  app.get("*", (req, res, next) => {
+    if (req.url.startsWith("/api")) {
+      return next();
+    }
+    const indexPath = path.join(clientDistPath, "index.html");
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    }
+    next();
+  });
+} else {
+  app.get("/", (req, res) => res.send("Server is Live! (Frontend build not found)"));
+}
+
+// Global Catch-all for undefined API routes
 app.use((req, res) => {
   res.status(404).json({
     success: false,

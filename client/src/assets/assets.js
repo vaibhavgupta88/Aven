@@ -56,6 +56,7 @@ export const AiToolsData = [
     Icon: SquarePen,
     bg: { from: "#FF4D5E", to: "#E6394A" },
     path: "/ai/write-article",
+    isPro: false,
   },
   {
     title: "Blog Title Generator",
@@ -64,6 +65,7 @@ export const AiToolsData = [
     Icon: Hash,
     bg: { from: "#FF4D5E", to: "#E6394A" },
     path: "/ai/blog-titles",
+    isPro: false,
   },
   {
     title: "AI Image Generation",
@@ -72,6 +74,7 @@ export const AiToolsData = [
     Icon: Image,
     bg: { from: "#FF4D5E", to: "#E6394A" },
     path: "/ai/generate-images",
+    isPro: false,
   },
   {
     title: "Background Removal",
@@ -80,6 +83,7 @@ export const AiToolsData = [
     Icon: Eraser,
     bg: { from: "#FF4D5E", to: "#E6394A" },
     path: "/ai/remove-background",
+    isPro: true,
   },
   {
     title: "Object Removal",
@@ -88,6 +92,7 @@ export const AiToolsData = [
     Icon: Scissors,
     bg: { from: "#FF4D5E", to: "#E6394A" },
     path: "/ai/remove-object",
+    isPro: true,
   },
   {
     title: "Resume Reviewer",
@@ -96,6 +101,7 @@ export const AiToolsData = [
     Icon: FileText,
     bg: { from: "#FF4D5E", to: "#E6394A" },
     path: "/ai/review-resume",
+    isPro: true,
   },
 ];
 

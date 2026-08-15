@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Image as ImageIcon, Sparkles, Download } from "lucide-react";
 import axios from "axios";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import toast from "react-hot-toast";
+import { saveLocalCreation } from "../lib/creationsStorage";
 
 const GenerateImages = () => {
   const imageStyle = [
@@ -23,6 +24,7 @@ const GenerateImages = () => {
   const [content, setContent] = useState("");
 
   const { getToken } = useAuth();
+  const { user } = useUser();
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
@@ -31,16 +33,35 @@ const GenerateImages = () => {
       setLoading(true);
       const prompt = `${input.trim()} in ${selectedStyle} style`;
 
+      let token = "";
+      try {
+        token = await getToken();
+      } catch (tokenErr) {
+        console.warn("Token fetch note:", tokenErr);
+      }
+
+      const headers = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      if (user?.id) headers["x-user-id"] = user.id;
+
       const { data } = await axios.post(
         "/api/ai/generate-image",
         { prompt, publish },
-        {
-          headers: { Authorization: `Bearer ${await getToken()}` },
-        }
+        { headers }
       );
 
       if (data.success) {
         setContent(data.content);
+        const newCreation = {
+          id: `creation_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+          user_id: user?.id || "guest",
+          prompt,
+          content: data.content,
+          type: "image",
+          publish: Boolean(publish),
+          created_at: new Date().toISOString(),
+        };
+        saveLocalCreation(user?.id, newCreation);
       } else {
         toast.error(data.message);
       }
