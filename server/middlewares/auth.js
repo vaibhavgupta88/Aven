@@ -10,7 +10,12 @@ export const auth = async (req, res, next) => {
       return res.status(401).json({ success: false, message: "Unauthorized. Please log in." });
     }
 
-    const user = await clerkClient.users.getUser(userId);
+    let user = null;
+    try {
+      user = await clerkClient.users.getUser(userId);
+    } catch (clerkErr) {
+      console.warn("Clerk getUser warning:", clerkErr.message);
+    }
 
     let hasPremiumPlan = false;
     try {
@@ -23,10 +28,10 @@ export const auth = async (req, res, next) => {
 
     const isPremium =
       hasPremiumPlan ||
-      user.publicMetadata?.plan === "premium" ||
-      user.privateMetadata?.plan === "premium";
+      user?.publicMetadata?.plan === "premium" ||
+      user?.privateMetadata?.plan === "premium";
 
-    const freeUsage = user.privateMetadata?.free_usage || 0;
+    const freeUsage = user?.privateMetadata?.free_usage || 0;
 
     req.userId = userId;
     req.plan = isPremium ? "premium" : "free";
@@ -36,6 +41,6 @@ export const auth = async (req, res, next) => {
     next();
   } catch (error) {
     console.error("Auth middleware error:", error);
-    res.json({ success: false, message: error.message });
+    res.json({ success: false, message: error.message || "Authentication error" });
   }
 };

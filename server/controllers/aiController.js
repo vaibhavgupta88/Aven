@@ -12,7 +12,7 @@ const AI = new OpenAI({
 });
 
 const callGeminiWithFallback = async (params) => {
-  const models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+  const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
   let lastError;
   for (const model of models) {
     try {
@@ -23,8 +23,6 @@ const callGeminiWithFallback = async (params) => {
     } catch (err) {
       console.log(`Gemini model [${model}] failed (${err?.status}): ${err?.message}`);
       lastError = err;
-      const isTransient = err?.status === 503 || err?.status === 429 || err?.status === 404 || err?.status === 500;
-      if (!isTransient) throw err;
     }
   }
   throw lastError;
@@ -68,19 +66,27 @@ export const generateArticle = async (req, res) => {
 
     const content = response.choices[0].message.content;
 
-    await sql` INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${prompt}, ${content}, 'article') `;
+    try {
+      await sql` INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${prompt}, ${content}, 'article') `;
+    } catch (dbErr) {
+      console.warn("DB save note:", dbErr.message);
+    }
 
     if (plan !== "premium") {
-      await clerkClient.users.updateUserMetadata(userId, {
-        privateMetadata: {
-          free_usage: free_usage + 1,
-        },
-      });
+      try {
+        await clerkClient.users.updateUserMetadata(userId, {
+          privateMetadata: {
+            free_usage: free_usage + 1,
+          },
+        });
+      } catch (clerkErr) {
+        console.warn("Clerk metadata note:", clerkErr.message);
+      }
     }
 
     res.json({ success: true, content });
   } catch (error) {
-    console.log("generateArticle error:", error.status, error.message);
+    console.log("generateArticle error:", error?.status, error?.message);
     const isRateLimit = error?.status === 429 || error?.status === 503;
     const userMsg = isRateLimit
       ? "AI service is temporarily busy or rate-limited. Please wait 30 seconds and try again."
