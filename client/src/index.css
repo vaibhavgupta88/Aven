@@ -255,8 +255,121 @@ footer a[aria-label] svg,
   --color-primary: #FF4D5E;
 }
 
-.reset-tw, .reset-tw * {
-  all: revert !important;
+/* Modern Sleek Markdown & Table Typography Styles */
+.reset-tw table {
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  margin: 1.25rem 0 !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+.light .reset-tw table {
+  border-color: #cbd5e1 !important;
+  background-color: #ffffff !important;
+}
+
+.reset-tw th {
+  background-color: rgba(255, 77, 94, 0.15) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-align: left !important;
+  padding: 10px 14px !important;
+  font-size: 0.8rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.light .reset-tw th {
+  color: #0B1221 !important;
+  border-bottom-color: #cbd5e1 !important;
+}
+
+.reset-tw td {
+  padding: 10px 14px !important;
+  font-size: 0.85rem !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  color: #e2e8f0 !important;
+}
+
+.light .reset-tw td {
+  color: #334155 !important;
+  border-bottom-color: #f1f5f9 !important;
+}
+
+.reset-tw tr:last-child td {
+  border-bottom: none !important;
+}
+
+.reset-tw tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+.reset-tw tr:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.reset-tw h1 {
+  font-size: 1.4rem !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.light .reset-tw h1 {
+  color: #0B1221 !important;
+}
+
+.reset-tw h2 {
+  font-size: 1.2rem !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  margin-top: 1.25rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.light .reset-tw h2 {
+  color: #0B1221 !important;
+}
+
+.reset-tw h3 {
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+  color: #f1f5f9 !important;
+  margin-top: 1rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.light .reset-tw h3 {
+  color: #1e293b !important;
+}
+
+.reset-tw p {
+  margin-bottom: 0.85rem !important;
+  line-height: 1.6 !important;
+}
+
+.reset-tw ul, .reset-tw ol {
+  margin-left: 1.25rem !important;
+  margin-bottom: 0.85rem !important;
+}
+
+.reset-tw li {
+  margin-bottom: 0.35rem !important;
+}
+
+.reset-tw code {
+  background-color: rgba(255, 77, 94, 0.15) !important;
+  color: #ff7a88 !important;
+  padding: 2px 6px !important;
+  border-radius: 6px !important;
+  font-size: 0.85em !important;
+  font-family: monospace !important;
 }
 
 .cl-drawerRoot {
