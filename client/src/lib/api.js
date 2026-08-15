@@ -23,8 +23,8 @@ export const getApiBaseUrl = () => {
     }
   }
 
-  // 3. Fallback for relative requests
-  return "";
+  // 3. Fallback for production server
+  return "https://aven-server.vercel.app";
 };
 
 axios.defaults.baseURL = getApiBaseUrl();
