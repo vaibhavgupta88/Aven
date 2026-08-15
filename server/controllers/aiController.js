@@ -315,7 +315,11 @@ const callGeminiWithFallback = async (params) => {
   const apiKey = process.env.GEMINI_API_KEY;
   const userPrompt = params.messages?.find((m) => m.role === "user")?.content || "Artificial Intelligence";
   const userCategory = params.messages?.find((m) => m.role === "user")?.category || "General";
-  const userTargetLength = params.targetLength || params.messages?.find((m) => m.role === "user")?.targetLength || 800;
+  const userTargetLength =
+    params.targetLength ||
+    params.messages?.find((m) => m.role === "user")?.targetLength ||
+    params.messages?.find((m) => m.role === "user")?.length ||
+    800;
 
   let cleanTopic = userPrompt
     .replace(/^Generate a blog title for the keyword\s+/i, "")
