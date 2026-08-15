@@ -1,13 +1,13 @@
 import axios from "axios";
 
 // Resolves API Base URL:
-// - On Vercel production: https://aven-server.vercel.app
 // - On local desktop dev: http://localhost:3000
 // - On local mobile / Wi-Fi dev: http://<local-ip>:3000
+// - On deployed Vercel production: "" (relative URL hitting current active deployment)
 export const getApiBaseUrl = () => {
   const envUrl = import.meta.env.VITE_BASE_URL;
 
-  // 1. If VITE_BASE_URL is set to a valid non-localhost production URL, use it
+  // 1. If VITE_BASE_URL is explicitly set to a valid external URL, use it
   if (
     envUrl &&
     envUrl.trim() !== "" &&
@@ -33,8 +33,8 @@ export const getApiBaseUrl = () => {
     }
   }
 
-  // 3. Fallback for production server
-  return "https://aven-server.vercel.app";
+  // 3. Fallback for deployed production (relative URL hits active deployment)
+  return "";
 };
 
 axios.defaults.baseURL = getApiBaseUrl();
