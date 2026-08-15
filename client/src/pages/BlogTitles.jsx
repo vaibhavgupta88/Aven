@@ -3,6 +3,7 @@ import { Hash, Sparkles } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { useAuth } from "@clerk/clerk-react";
 
 const BlogTitles = () => {
@@ -126,7 +127,7 @@ const BlogTitles = () => {
         ) : (
           <div className="mt-4 flex-1 overflow-y-scroll text-sm leading-relaxed text-gray-300">
             <div className="reset-tw">
-              <Markdown>{content}</Markdown>
+              <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
             </div>
           </div>
         )}
