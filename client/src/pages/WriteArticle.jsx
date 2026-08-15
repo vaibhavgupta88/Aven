@@ -42,6 +42,19 @@ const WriteArticle = () => {
 
       if (data.success) {
         setContent(data.content);
+        try {
+          const newCreation = {
+            id: `creation_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+            prompt,
+            content: data.content,
+            type: "article",
+            created_at: new Date().toISOString(),
+          };
+          const existing = JSON.parse(localStorage.getItem("aven_local_creations") || "[]");
+          localStorage.setItem("aven_local_creations", JSON.stringify([newCreation, ...existing]));
+        } catch (e) {
+          console.warn("LocalStorage save note:", e);
+        }
       } else {
         toast.error(data.message);
       }

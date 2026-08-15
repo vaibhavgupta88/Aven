@@ -17,9 +17,8 @@ export const saveCreation = (userId, prompt, content, type, publish = false) => 
 };
 
 export const getCreationsByUser = (userId) => {
-  return inMemoryCreations.filter(
-    (item) => item.user_id === userId || item.user_id === "user_demo_guest"
-  );
+  // Preserve creations across sign-out and session switches
+  return inMemoryCreations;
 };
 
 export const getAllCreations = () => {
@@ -31,9 +30,7 @@ export const getPublishedMemoryCreations = () => {
 };
 
 export const removeCreation = (id, userId) => {
-  const index = inMemoryCreations.findIndex(
-    (item) => item.id === id && (item.user_id === userId || item.user_id === "user_demo_guest")
-  );
+  const index = inMemoryCreations.findIndex((item) => item.id === id);
   if (index !== -1) {
     inMemoryCreations.splice(index, 1);
     return true;

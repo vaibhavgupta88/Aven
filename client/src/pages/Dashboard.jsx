@@ -5,6 +5,8 @@ import CreationItem from "../components/CreationItem";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+const LOCAL_STORAGE_KEY = "aven_local_creations";
+
 const Dashboard = () => {
   const [creations, setCreations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,19 +18,56 @@ const Dashboard = () => {
     user?.privateMetadata?.plan === "premium";
 
   const getDashboardData = useCallback(async () => {
+    let serverItems = [];
     try {
-      const token = await getToken();
+      let token = "";
+      try {
+        token = await getToken();
+      } catch (tErr) {
+        console.warn("Token fetch note:", tErr);
+      }
+
       const { data } = await axios.get("/api/user/get-user-creations", {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
 
-      if (data.success) {
-        setCreations(data.creations || []);
-      } else {
-        toast.error(data.message);
+      if (data.success && Array.isArray(data.creations)) {
+        serverItems = data.creations;
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
+      console.warn("Dashboard fetch note:", error.message);
+    }
+
+    // Read stored creations from browser localStorage
+    let localItems = [];
+    try {
+      const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (stored) {
+        localItems = JSON.parse(stored);
+      }
+    } catch (e) {
+      console.warn("Local storage read note:", e);
+    }
+
+    // Combine server + local items deduplicated by id
+    const combinedMap = new Map();
+    [...serverItems, ...localItems].forEach((item) => {
+      if (item && item.id) {
+        combinedMap.set(item.id, item);
+      }
+    });
+
+    const finalCreations = Array.from(combinedMap.values()).sort(
+      (a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0)
+    );
+
+    setCreations(finalCreations);
+
+    // Sync merged items back to localStorage for offline / sign-out persistence
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(finalCreations));
+    } catch (e) {
+      console.warn("Local storage write note:", e);
     }
 
     setLoading(false);
@@ -37,6 +76,18 @@ const Dashboard = () => {
   useEffect(() => {
     getDashboardData();
   }, [getDashboardData]);
+
+  const handleDelete = (id) => {
+    setCreations((prev) => {
+      const updated = prev.filter((c) => c.id !== id);
+      try {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
+      } catch (e) {
+        console.warn("Local storage update note:", e);
+      }
+      return updated;
+    });
+  };
 
   return (
     <div className="h-full overflow-y-auto p-4 sm:p-6 text-gray-200 tracking-[-0.02em]">
@@ -82,7 +133,7 @@ const Dashboard = () => {
               <CreationItem
                 key={item.id}
                 item={item}
-                onDelete={(id) => setCreations((prev) => prev.filter((c) => c.id !== id))}
+                onDelete={handleDelete}
               />
             ))
           )}
