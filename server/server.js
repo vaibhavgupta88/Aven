@@ -11,7 +11,12 @@ const app = express();
 
 connectCloudinary();
 
-app.use(cors());
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "x-api-key"]
+}));
+app.options("*", cors());
 app.use(express.json());
 app.use(clerkMiddleware());
 
