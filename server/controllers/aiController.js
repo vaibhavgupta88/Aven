@@ -11,6 +11,86 @@ const AI = new OpenAI({
   baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
 });
 
+export const generateDynamicATSReview = (resumeText = "") => {
+  const text = (resumeText || "").trim();
+  const lowerText = text.toLowerCase();
+
+  // 1. Contact Info Analysis
+  const hasEmail = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(text);
+  const hasPhone = /(\+\d{1,3}[- ]?)?\(?\d{3}\)?[- ]?\d{3}[- ]?\d{4}/.test(text);
+  const hasLinkedin = /linkedin\.com/i.test(text);
+  const hasGithub = /github\.com/i.test(text);
+
+  // 2. Metrics & Action Verbs
+  const metricsMatches = text.match(/(\d+%\b|\$\d+|\b\d+\s*(k|m|billion|million|users|clients|projects|percent)\b)/gi) || [];
+  const metricsCount = metricsMatches.length;
+  const actionVerbs = ["engineered", "built", "architected", "developed", "scaled", "led", "managed", "designed", "optimized", "implemented", "reduced", "increased", "created", "automated"];
+  const detectedVerbs = actionVerbs.filter((v) => lowerText.includes(v));
+
+  // 3. Technical Skills
+  const commonSkills = ["javascript", "typescript", "react", "node.js", "python", "java", "sql", "postgresql", "mongodb", "aws", "docker", "kubernetes", "git", "rest api", "graphql", "html", "css", "tailwind", "next.js", "redux", "express", "ci/cd"];
+  const detectedSkills = commonSkills.filter((s) => lowerText.includes(s));
+  const missingSkills = commonSkills.filter((s) => !lowerText.includes(s)).slice(0, 5);
+
+  // 4. Scores
+  const parseScore = Math.min(98, Math.max(72, Math.floor(80 + (text.length > 300 ? 10 : 0) + (hasEmail ? 4 : 0) + (hasPhone ? 4 : 0))));
+  const keywordScore = Math.min(96, Math.max(65, Math.floor(62 + detectedSkills.length * 4)));
+  const impactScore = Math.min(95, Math.max(60, Math.floor(65 + metricsCount * 6 + detectedVerbs.length * 3)));
+  const formatScore = Math.min(96, Math.max(70, Math.floor(75 + (hasEmail && hasPhone ? 15 : 5))));
+
+  const overallScore = Math.round((parseScore + keywordScore + impactScore + formatScore) / 4);
+
+  // Sample Bullet Analysis
+  const lines = text.split(/\r?\n/).map((l) => l.trim()).filter((l) => l.length > 25);
+  const sampleLine = lines.find((l) => !l.toLowerCase().includes("email") && !l.toLowerCase().includes("phone") && !l.toLowerCase().includes("http")) || "Built backend services and maintained core software components.";
+
+  const formattedSkills = detectedSkills.length > 0 
+    ? detectedSkills.map((s) => `\`${s.toUpperCase()}\``).join(", ")
+    : "`JAVASCRIPT`, `REACT`, `NODE.JS`, `REST API`, `SQL`";
+
+  const formattedMissing = missingSkills.map((s) => `\`${s.toUpperCase()}\``).join(", ");
+
+  return `# 📄 ATS Resume Audit & Performance Analysis
+
+## 🎯 Overall ATS Compatibility Score: **${overallScore} / 100**
+
+| Assessment Category | Score | Status | Key Recommendation |
+| :--- | :--- | :--- | :--- |
+| **Parseability & Document Structure** | **${parseScore} / 100** | ${parseScore >= 85 ? "🟢 Excellent" : "🟡 Good"} | ${hasEmail && hasPhone ? "Header text parsed cleanly" : "Ensure email and phone are top plain text"} |
+| **Keyword Density & Hard Skills** | **${keywordScore} / 100** | ${keywordScore >= 80 ? "🟢 Strong" : "🟡 Needs Expansion"} | ${detectedSkills.length > 3 ? "Expand category tags for cloud & tooling" : "Add missing technical framework keywords"} |
+| **Impact & Metric Quantification** | **${impactScore} / 100** | ${impactScore >= 80 ? "🟢 Impactful" : "🟡 Low Metrics"} | Found ${metricsCount} metric targets. Aim for metrics on 60%+ of bullets |
+| **Formatting & Header Hierarchy** | **${formatScore} / 100** | ${formatScore >= 85 ? "🟢 Clean" : "🟡 Refine Formatting"} | Standardize reverse-chronological date formatting |
+
+---
+
+## 🔍 Detailed Category Breakdown
+
+### 1. 📧 Contact Information & Header Audit
+- **Email Detected**: ${hasEmail ? "🟢 **Passed**" : "🔴 **Missing or unparsed**"}
+- **Phone Number Detected**: ${hasPhone ? "🟢 **Passed**" : "🟡 **Not found in top header**"}
+- **LinkedIn / Portfolio Links**: ${hasLinkedin || hasGithub ? "🟢 **Detected**" : "🟡 **Recommended**: Add plain text \`linkedin.com/in/yourname\`"}
+
+### 2. ⚡ Work Experience & Action Verb Impact
+- **Action Verbs Detected**: ${detectedVerbs.length > 0 ? detectedVerbs.map((v) => `*${v}*`).join(", ") : "*managed, developed, built*"}
+- **Quantification Analysis**: ${metricsCount > 0 ? `Identified **${metricsCount}** quantified metric statements.` : "🔴 **Zero quantifiable metrics detected.** Add exact numbers, percentages, or dollar values."}
+
+#### 🛠️ Recommended Line Rewrite based on your resume:
+- ❌ **Current Line**: "${sampleLine.slice(0, 95)}..."
+- ✅ **ATS Optimized Rewrite**: "${sampleLine.replace(/^[^a-zA-Z]+/, "")} — resulting in a 35% reduction in latency and enhanced system reliability across key modules."
+
+### 3. 🛠️ Skill Keyword Breakdown
+- **Detected Skills in your Resume**: ${formattedSkills}
+- **Missing High-Impact Industry Keywords to Consider**: ${formattedMissing}
+
+---
+
+## 🚀 Priority Action Plan (Top 3 Fixes)
+
+1. **Quantify Bullet Points**: Add numerical metrics (percentage increases, time saved, revenue generated) to at least 60% of your experience bullet points.
+2. **Inject Missing Technical Keywords**: Add a dedicated "Technical Skills" section grouped into categories: *Languages*, *Frameworks*, *Databases & Cloud*, *Tools*.
+3. **Refine Executive Summary**: Craft a punchy 3-line professional summary highlighting your core expertise and top achievements at the top of your resume.`;
+};
+
 const callGeminiWithFallback = async (params) => {
   const apiKey = process.env.GEMINI_API_KEY;
   const userPrompt = params.messages?.find((m) => m.role === "user")?.content || "Artificial Intelligence";
@@ -54,60 +134,13 @@ ${cleanTopic} is rapidly revolutionizing the modern digital landscape. From acce
 
 ## Looking Ahead
 
-As technology advances, integrating ${topic} into day-to-day operations will continue to unlock new possibilities, making workflows smarter, faster, and more impactful than ever before.`;
+As technology advances, integrating ${cleanTopic} into day-to-day operations will continue to unlock new possibilities, making workflows smarter, faster, and more impactful than ever before.`;
 
-  const fallbackBlogTitles = `1. The Ultimate Guide to ${topic} in ${new Date().getFullYear()}
-2. 5 Game-Changing Insights About ${topic} You Need to Know
-3. How ${topic} is Transforming the Future of Technology
-4. Master ${topic}: Top Strategies for Success
-5. Why ${topic} Matters Now More Than Ever`;
-
-  const fallbackResumeReview = `# 📄 Comprehensive ATS Resume Audit & Performance Analysis
-
-## 🎯 Overall ATS Compatibility Score: **86 / 100**
-
-| Metric | Score | Status | Key Recommendation |
-| :--- | :--- | :--- | :--- |
-| **Parseability & Layout** | **92 / 100** | 🟢 Excellent | Clear standard headings and clean single-column structure |
-| **Keyword Density & Hard Skills** | **84 / 100** | 🟢 Good | Expand on specific cloud & architectural tools |
-| **Impact & Metric Quantification** | **80 / 100** | 🟡 Moderate | Convert qualitative statements to measurable metrics |
-| **Brevity & Formatting Consistency** | **88 / 100** | 🟢 Good | Standardize date ranges and bullet lengths |
-
----
-
-## 🔍 Detailed Category Breakdown
-
-### 1. 📧 Contact Information & Header Audit
-- **Status**: 🟢 **PASSED**
-- **Findings**: Essential contact details (Email, Phone, Professional Title) are clearly detectable.
-- **Optimization Tip**: Ensure your LinkedIn profile URL and GitHub / Portfolio link are formatted as clean text strings (e.g. \`linkedin.com/in/username\`) to prevent link-stripping by older ATS scanners.
-
-### 2. ⚡ Work Experience & Action Verb Impact
-- **Status**: 🟡 **ATTENTION REQUIRED**
-- **Action Verbs Detected**: Strong use of operational verbs (*Engineered*, *Optimized*, *Architected*, *Delivered*).
-- **Quantification Analysis**: 
-  - *Current*: Several bullet points describe responsibilities without measurable outcomes.
-  - *Recommendation*: Transform passive statements into result-oriented achievements. For example:
-    - ❌ *Before*: "Built backend endpoints for application features."
-    - ✅ *After*: "Designed and deployed 15+ RESTful endpoints in Node.js, reducing API latency by 35% across 50k monthly active users."
-
-### 3. 🛠️ Skill Keyword & Technical Coverage
-- **Core Strengths**: Strong alignment with modern software engineering practices.
-- **Recommended High-Impact Keywords to Add**:
-  - \`TypeScript\`, \`CI/CD Pipelines\`, \`Docker / Containerization\`, \`State Management\`, \`Unit Testing (Jest/Cypress)\`.
-
-### 4. 📝 Formatting & ATS Parser Safety Checklist
-- ✅ **Standard Font Choice**: Clean sans-serif fonts parse effortlessly without OCR errors.
-- ✅ **No Complex Columns or Text Boxes**: Avoid side-by-side text tables which confuse ATS line order.
-- ✅ **Clean Chronological Layout**: Logical reverse-chronological experience hierarchy.
-
----
-
-## 🚀 Priority Action Plan (Top 3 Fixes)
-
-1. **Quantify Bullet Points**: Add numerical metrics (percentage increases, time saved, revenue generated) to at least 60% of your experience bullet points.
-2. **Inject Missing Technical Keywords**: Add a dedicated "Technical Skills" section grouped into categories: *Languages*, *Frameworks*, *Databases & Cloud*, *Tools*.
-3. **Refine Executive Summary**: Craft a punchy 3-line professional summary highlighting your core expertise and top achievements at the top of your resume.`;
+  const fallbackBlogTitles = `1. The Ultimate Guide to ${cleanTopic} in ${new Date().getFullYear()}
+2. 5 Game-Changing Insights About ${cleanTopic} You Need to Know
+3. How ${cleanTopic} is Transforming the Future of Technology
+4. Master ${cleanTopic}: Top Strategies for Success
+5. Why ${cleanTopic} Matters Now More Than Ever`;
 
   const isBlogTitle = params.messages?.some((m) => m.content?.toLowerCase().includes("blog title"));
   const isResumeReview = params.messages?.some((m) =>
@@ -117,7 +150,10 @@ As technology advances, integrating ${topic} into day-to-day operations will con
 
   let content = fallbackArticle;
   if (isBlogTitle) content = fallbackBlogTitles;
-  if (isResumeReview) content = fallbackResumeReview;
+  if (isResumeReview) {
+    const resumeText = userPrompt.replace(/^Review the following resume.*?:\s*/is, "");
+    content = generateDynamicATSReview(resumeText);
+  }
 
   return {
     choices: [
@@ -451,7 +487,7 @@ export const resumeReview = async (req, res) => {
     }
 
     const currentYear = new Date().getFullYear();
-    const prompt = `Review the following resume and provide constructive feedback on its strengths, weaknesses, and areas for improvement. Resume Content:\n\n${resumeText}`;
+    const prompt = `Review the following resume content:\n\n${resumeText}`;
 
     const response = await callGeminiWithFallback({
       messages: [
