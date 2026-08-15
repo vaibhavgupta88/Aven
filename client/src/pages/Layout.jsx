@@ -8,8 +8,17 @@ import { useTheme } from "../context/ThemeContext";
 
 const Layout = () => {
   const [sidebar, setSidebar] = useState(false);
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const { theme } = useTheme();
+
+  if (!isLoaded) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#09090B] gap-4">
+        <div className="w-8 h-8 rounded-full border-2 border-[#FF4D5E] border-t-transparent animate-spin"></div>
+        <p className="text-sm text-gray-400 font-medium">Loading workspace...</p>
+      </div>
+    );
+  }
 
   return user ? (
     <div className="flex flex-col items-start justify-start h-screen bg-[#09090B] text-gray-200">
@@ -48,7 +57,7 @@ const Layout = () => {
       </div>
     </div>
   ) : (
-    <div className="flex items-center justify-center min-h-screen bg-[#09090B]">
+    <div className="flex items-center justify-center min-h-screen bg-[#09090B] p-4">
       <SignIn />
     </div>
   );
