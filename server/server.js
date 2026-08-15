@@ -26,13 +26,15 @@ app.options("*", cors());
 app.use(express.json());
 
 // Defensive Clerk Middleware wrapper for Serverless runtime stability
-const safeClerkMiddleware = clerkMiddleware();
 app.use((req, res, next) => {
+  if (!process.env.CLERK_SECRET_KEY && !process.env.CLERK_PUBLISHABLE_KEY) {
+    return next();
+  }
   try {
-    return safeClerkMiddleware(req, res, next);
+    return clerkMiddleware()(req, res, next);
   } catch (err) {
     console.error("Clerk Middleware Error:", err.message);
-    next();
+    return next();
   }
 });
 

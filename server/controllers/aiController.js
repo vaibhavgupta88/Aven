@@ -7,7 +7,7 @@ import fs from "fs";
 import pdf from "pdf-parse/lib/pdf-parse.js";
 
 const AI = new OpenAI({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: process.env.GEMINI_API_KEY || "dummy_key_for_init",
   baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
 });
 
