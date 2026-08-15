@@ -9,22 +9,48 @@ import stripeRouter from "./routes/stripeRoutes.js";
 
 const app = express();
 
-connectCloudinary();
+try {
+  connectCloudinary();
+} catch (err) {
+  console.warn("Cloudinary init warning:", err.message);
+}
 
-app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "x-api-key"]
-}));
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "x-api-key"],
+  })
+);
 app.options("*", cors());
 app.use(express.json());
-app.use(clerkMiddleware());
+
+// Defensive Clerk Middleware wrapper for Serverless runtime stability
+const safeClerkMiddleware = clerkMiddleware();
+app.use((req, res, next) => {
+  try {
+    return safeClerkMiddleware(req, res, next);
+  } catch (err) {
+    console.error("Clerk Middleware Error:", err.message);
+    next();
+  }
+});
 
 app.get("/", (req, res) => res.send("Server is Live!"));
+app.get("/api", (req, res) => res.send("Server API is Live!"));
 
 app.use("/api/stripe", stripeRouter);
 app.use("/api/ai", aiRouter);
 app.use("/api/user", userRouter);
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error("Global Express Error:", err);
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
+});
 
 const PORT = process.env.PORT || 3000;
 
