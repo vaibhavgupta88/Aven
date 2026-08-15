@@ -152,8 +152,8 @@ As technology advances, integrating ${cleanTopic} into day-to-day operations wil
 
   const isBlogTitle = params.messages?.some(
     (m) =>
-      m.content?.toLowerCase().includes("blog title") ||
-      m.content?.toLowerCase().includes("blog post titles") ||
+      m.content?.toLowerCase().includes("blog") ||
+      m.content?.toLowerCase().includes("titles") ||
       m.content?.toLowerCase().includes("copywriter")
   );
   const isResumeReview = params.messages?.some((m) =>
