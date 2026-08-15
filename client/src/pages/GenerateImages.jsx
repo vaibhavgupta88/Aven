@@ -29,7 +29,7 @@ const GenerateImages = () => {
 
     try {
       setLoading(true);
-      const prompt = `Generate an image of ${input} in ${selectedStyle} style`;
+      const prompt = `${input.trim()} in ${selectedStyle} style`;
 
       const { data } = await axios.post(
         "/api/ai/generate-image",

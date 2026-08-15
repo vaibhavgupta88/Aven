@@ -134,7 +134,7 @@ const Community = () => {
                   {/* High Contrast Hover Overlay */}
                   <div className="absolute inset-0 flex gap-2 items-end justify-between p-4 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl community-card-overlay">
                     <p className="text-sm line-clamp-2 font-medium !text-white drop-shadow-md">
-                      {creation.prompt}
+                      {creation.prompt ? creation.prompt.replace(/^Generate an image of /i, "").replace(/^Write an article about /i, "") : ""}
                     </p>
                     <div className="flex gap-1.5 items-center bg-black/80 px-3 py-1.5 rounded-full backdrop-blur-md border border-white/20 ml-auto shrink-0 shadow-lg">
                       <span className="text-xs font-semibold !text-white" style={{ color: "#ffffff" }}>

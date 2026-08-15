@@ -77,7 +77,9 @@ const CreationItem = ({ item, onDelete }) => {
     >
       <div className="flex justify-between items-center gap-3 sm:gap-4">
         <div className="min-w-0 flex-1">
-          <h3 className="font-semibold text-white text-sm sm:text-base break-words">{item.prompt}</h3>
+          <h3 className="font-semibold text-white text-sm sm:text-base break-words">
+            {item.prompt ? item.prompt.replace(/^Generate an image of /i, "").replace(/^Write an article about /i, "") : ""}
+          </h3>
           <p className="text-xs text-gray-400 mt-1">
             {new Date(item.created_at).toLocaleDateString("en-US", {
               month: "short",
