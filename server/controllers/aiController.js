@@ -733,7 +733,71 @@ const callGeminiWithFallback = async (params) => {
 
   // If valid Gemini key exists, attempt live API call
   if (apiKey && apiKey !== "dummy_key_for_init" && apiKey.trim().length > 10) {
-    const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"];
+    const models = [
+      "gemini-flash-latest",
+      "gemini-3.5-flash",
+      "gemini-3.7-flash",
+      "gemini-flash-lite-latest",
+      "gemini-3-flash-preview",
+      "gemini-pro-latest",
+    ];
+
+    const isBlogTitle = params.messages?.some(
+      (m) =>
+        m.content?.toLowerCase().includes("blog post titles") ||
+        m.content?.toLowerCase().includes("catchy, high-converting") ||
+        m.content?.toLowerCase().includes("copywriter")
+    );
+    const isResumeReview = params.messages?.some(
+      (m) =>
+        m.content?.toLowerCase().includes("ats resume auditor") ||
+        m.content?.toLowerCase().includes("resume content")
+    );
+
+    const minAcceptableWords = isBlogTitle ? 15 : isResumeReview ? 100 : Math.min(350, Math.round(userTargetLength * 0.55));
+
+    // Method 1: Native Google Gemini REST endpoint (Primary, reliable token allocation)
+    for (const model of models) {
+      try {
+        const systemPrompt = params.messages?.find((m) => m.role === "system")?.content || "";
+        const userPromptText = params.messages?.find((m) => m.role === "user")?.content || "";
+        const combinedPrompt = systemPrompt ? `${systemPrompt}\n\n${userPromptText}` : userPromptText;
+
+        const { data } = await axios.post(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey.trim()}`,
+          {
+            contents: [{ parts: [{ text: combinedPrompt }] }],
+            generationConfig: {
+              maxOutputTokens: params.max_tokens || 4000,
+              temperature: params.temperature ?? 0.7,
+            },
+          },
+          { headers: { "Content-Type": "application/json" }, timeout: 45000 }
+        );
+
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) {
+          const wordCount = text.split(/\s+/).filter(Boolean).length;
+          if (wordCount >= minAcceptableWords) {
+            return {
+              choices: [
+                {
+                  message: {
+                    content: text,
+                  },
+                },
+              ],
+            };
+          } else {
+            console.log(`Model [${model}] returned truncated output (${wordCount} words < ${minAcceptableWords} required). Trying next model...`);
+          }
+        }
+      } catch (restErr) {
+        console.log(`Native REST model [${model}] note: ${restErr?.response?.status || restErr?.message}`);
+      }
+    }
+
+    // Method 2: OpenAI-compatible endpoint (Secondary fallback)
     for (const model of models) {
       try {
         const client = new OpenAI({
@@ -744,11 +808,15 @@ const callGeminiWithFallback = async (params) => {
           ...params,
           model,
         });
-        if (completion?.choices?.[0]?.message?.content) {
-          return completion;
+        const content = completion?.choices?.[0]?.message?.content;
+        if (content) {
+          const wordCount = content.split(/\s+/).filter(Boolean).length;
+          if (wordCount >= minAcceptableWords) {
+            return completion;
+          }
         }
       } catch (err) {
-        console.log(`Gemini model [${model}] failed (${err?.status}): ${err?.message}`);
+        console.log(`OpenAI format model [${model}] note (${err?.status}): ${err?.message}`);
       }
     }
   }
@@ -793,6 +861,31 @@ const getUserId = (req) =>
   (typeof req.auth === "function" ? req.auth()?.userId : req.auth?.userId) ||
   "user_demo_guest";
 
+const ensureCompleteEnding = (rawText) => {
+  if (!rawText) return "";
+  let text = rawText.trim();
+
+  // If already ends with period, exclamation, question mark, closing quote/bracket
+  if (/[.!?]["'”)]?\s*$/.test(text)) {
+    return text;
+  }
+
+  // Find the last sentence-ending punctuation mark
+  const lastPeriod = Math.max(
+    text.lastIndexOf("."),
+    text.lastIndexOf("!"),
+    text.lastIndexOf("?")
+  );
+
+  // If the last complete sentence is in the last 25% of the text, cleanly trim to it
+  if (lastPeriod > text.length * 0.7) {
+    return text.substring(0, lastPeriod + 1).trim();
+  }
+
+  // Otherwise append a closing period
+  return text + ".";
+};
+
 export const generateArticle = async (req, res) => {
   try {
     const userId = getUserId(req);
@@ -808,30 +901,43 @@ export const generateArticle = async (req, res) => {
     }
 
     const targetWords = Number(length) || 800;
-    const maxTokens = Math.max(3500, Math.min(8000, Math.round(targetWords * 3.5)));
+
+    let targetLabel = "Short (500-800 words)";
+    let wordInstruction = "Your target length is strictly between 550 and 750 words. Do NOT exceed 800 words, and do not write fewer than 500 words.";
+    let maxTokens = 4000;
+
+    if (targetWords > 800 && targetWords <= 1200) {
+      targetLabel = "Medium (800-1200 words)";
+      wordInstruction = "Your target length is strictly between 850 and 1100 words. Do NOT exceed 1200 words, and do not write fewer than 800 words.";
+      maxTokens = 5000;
+    } else if (targetWords > 1200) {
+      targetLabel = "Long (1200+ words)";
+      wordInstruction = "Your target length is an in-depth comprehensive piece of 1300 to 1800 words.";
+      maxTokens = 7500;
+    }
 
     const response = await callGeminiWithFallback({
       targetLength: targetWords,
       messages: [
         {
           role: "system",
-          content: `You are an elite, comprehensive long-form content creator and subject matter expert.
-Your job is to write a deeply researched, comprehensive, full-length article about "${prompt}".
+          content: `You are an elite, professional content creator and subject matter expert.
+Your job is to write a well-structured, engaging article about "${prompt}".
 
-CRITICAL WORD COUNT REQUIREMENT:
-- You MUST write a detailed article containing AT LEAST ${targetWords} words.
-- Do NOT summarize or provide a brief outline.
-- Write multi-paragraph sections covering introduction, background, core mechanics, real-world implementations, case studies, step-by-step strategies, and long-term conclusions.
-- Format with standard markdown headings (# for main title, ## for major sections, ### for subsections).
-- Do NOT use emojis or decorative symbols in headings.`,
+LENGTH SPECIFICATION (${targetLabel}):
+- ${wordInstruction}
+- Structure with standard markdown headings (# for main title, ## for major sections, ### for subsections).
+- Do NOT use emojis or decorative symbols in headings.
+- CRITICAL: You MUST write a complete final concluding paragraph that reaches a definitive closing thought and ends with a complete final sentence with a period. Never stop mid-sentence.`,
         },
-        { role: "user", content: `Write a complete ${targetWords}+ word comprehensive article about: ${prompt}`, targetLength: targetWords },
+        { role: "user", content: `Write a complete ${targetLabel} article about: ${prompt}`, targetLength: targetWords },
       ],
-      temperature: 0.7,
+      temperature: 0.65,
       max_tokens: maxTokens,
     });
 
-    const content = response.choices[0].message.content;
+    const rawContent = response.choices[0].message.content;
+    const content = ensureCompleteEnding(rawContent);
     saveCreation(userId, prompt, content, "article");
 
     try {
