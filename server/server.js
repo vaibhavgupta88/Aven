@@ -22,7 +22,14 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization", "x-api-key"],
   })
 );
-app.options("*", cors());
+
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+  next();
+});
+
 app.use(express.json());
 
 // Clerk authentication middleware
