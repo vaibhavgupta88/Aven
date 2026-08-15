@@ -56,21 +56,52 @@ As technology advances, integrating ${topic} into day-to-day operations will con
 4. Master ${topic}: Top Strategies for Success
 5. Why ${topic} Matters Now More Than Ever`;
 
-  const fallbackResumeReview = `### ATS Resume Review Summary
+  const fallbackResumeReview = `# 📄 Comprehensive ATS Resume Audit & Performance Analysis
 
-**Overall ATS & Structure Score**: 88/100
+## 🎯 Overall ATS Compatibility Score: **86 / 100**
 
-#### 1. Key Strengths
-- Strong action verbs and quantifiable achievements throughout work history.
-- Clean hierarchy and professional section formatting.
+| Metric | Score | Status | Key Recommendation |
+| :--- | :--- | :--- | :--- |
+| **Parseability & Layout** | **92 / 100** | 🟢 Excellent | Clear standard headings and clean single-column structure |
+| **Keyword Density & Hard Skills** | **84 / 100** | 🟢 Good | Expand on specific cloud & architectural tools |
+| **Impact & Metric Quantification** | **80 / 100** | 🟡 Moderate | Convert qualitative statements to measurable metrics |
+| **Brevity & Formatting Consistency** | **88 / 100** | 🟢 Good | Standardize date ranges and bullet lengths |
 
-#### 2. Weaknesses & Areas for Improvement
-- Add more industry-specific technical keywords to pass automated ATS filters.
-- Ensure contact information and LinkedIn URL are prominently placed at the top.
+---
 
-#### 3. Actionable Recommendations
-- Align bullet points with target job description keywords.
-- Include a concise 2-sentence professional summary at the beginning.`;
+## 🔍 Detailed Category Breakdown
+
+### 1. 📧 Contact Information & Header Audit
+- **Status**: 🟢 **PASSED**
+- **Findings**: Essential contact details (Email, Phone, Professional Title) are clearly detectable.
+- **Optimization Tip**: Ensure your LinkedIn profile URL and GitHub / Portfolio link are formatted as clean text strings (e.g. \`linkedin.com/in/username\`) to prevent link-stripping by older ATS scanners.
+
+### 2. ⚡ Work Experience & Action Verb Impact
+- **Status**: 🟡 **ATTENTION REQUIRED**
+- **Action Verbs Detected**: Strong use of operational verbs (*Engineered*, *Optimized*, *Architected*, *Delivered*).
+- **Quantification Analysis**: 
+  - *Current*: Several bullet points describe responsibilities without measurable outcomes.
+  - *Recommendation*: Transform passive statements into result-oriented achievements. For example:
+    - ❌ *Before*: "Built backend endpoints for application features."
+    - ✅ *After*: "Designed and deployed 15+ RESTful endpoints in Node.js, reducing API latency by 35% across 50k monthly active users."
+
+### 3. 🛠️ Skill Keyword & Technical Coverage
+- **Core Strengths**: Strong alignment with modern software engineering practices.
+- **Recommended High-Impact Keywords to Add**:
+  - \`TypeScript\`, \`CI/CD Pipelines\`, \`Docker / Containerization\`, \`State Management\`, \`Unit Testing (Jest/Cypress)\`.
+
+### 4. 📝 Formatting & ATS Parser Safety Checklist
+- ✅ **Standard Font Choice**: Clean sans-serif fonts parse effortlessly without OCR errors.
+- ✅ **No Complex Columns or Text Boxes**: Avoid side-by-side text tables which confuse ATS line order.
+- ✅ **Clean Chronological Layout**: Logical reverse-chronological experience hierarchy.
+
+---
+
+## 🚀 Priority Action Plan (Top 3 Fixes)
+
+1. **Quantify Bullet Points**: Add numerical metrics (percentage increases, time saved, revenue generated) to at least 60% of your experience bullet points.
+2. **Inject Missing Technical Keywords**: Add a dedicated "Technical Skills" section grouped into categories: *Languages*, *Frameworks*, *Databases & Cloud*, *Tools*.
+3. **Refine Executive Summary**: Craft a punchy 3-line professional summary highlighting your core expertise and top achievements at the top of your resume.`;
 
   const isBlogTitle = params.messages?.some((m) => m.content?.includes("blog title"));
   const isResumeReview = params.messages?.some((m) => m.content?.includes("ATS resume reviewer"));
@@ -417,7 +448,13 @@ export const resumeReview = async (req, res) => {
       messages: [
         {
           role: "system",
-          content: `You are an expert ATS resume reviewer and career coach. Note: The current year is ${currentYear}. Do NOT mark dates in or before ${currentYear} as future dates. Provide a complete, fully detailed review covering: 1) Overall ATS & Structure Score (out of 100), 2) Key Strengths, 3) Weaknesses & Areas for Improvement, and 4) Actionable Recommendations. Always finish your review cleanly with a complete concluding summary. Never truncate or leave your output cut off.`,
+          content: `You are an elite ATS resume auditor and career strategist. Note: Current year is ${currentYear}. Analyze the resume thoroughly and output a highly detailed, professional report using clean Markdown with the following exact structure:
+1. Overall ATS Compatibility Score (out of 100) with a detailed breakdown table comparing Parseability, Keyword Density, Metric Quantification, and Layout Consistency.
+2. Contact Information & Header Audit (Status, Findings, Tips).
+3. Work Experience & Action Verb Impact (with specific Before/After bullet point rewrite examples).
+4. Technical Keyword & Skill Gaps (High-impact missing keywords).
+5. ATS Parser Safety Checklist.
+6. Priority Action Plan (Top 3 actionable fixes).`,
         },
         { role: "user", content: prompt },
       ],
