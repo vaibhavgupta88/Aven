@@ -1,0 +1,437 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: -0.02em;
+  transition: background-color 0.25s cubic-bezier(0.22, 1, 0.36, 1), 
+              border-color 0.25s cubic-bezier(0.22, 1, 0.36, 1), 
+              color 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+body, p, span, div, button, input, textarea {
+  font-weight: 500;
+}
+
+:root.dark {
+  color-scheme: dark;
+}
+
+:root.light {
+  color-scheme: light;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* Dark Mode Defaults */
+.dark body {
+  background-color: #09090b;
+  color: #f3f4f6;
+}
+
+/* Light Mode Overrides with Deep Midnight Navy #0B1221 Text */
+.light body {
+  background-color: #f8fafc;
+  color: #0B1221;
+}
+
+.light section,
+.light div.bg-\[\#0B0F19\],
+.light div.bg-\[\#09090B\],
+.light section.bg-\[\#09090B\] {
+  background-color: #f8fafc !important;
+}
+
+.light div.bg-\[\#0D111D\],
+.light div.bg-\[\#090D16\],
+.light aside.bg-\[\#090D16\],
+.light aside.bg-\[\#09090B\] {
+  background-color: #ffffff !important;
+}
+
+/* Glassmorphic Floating Header */
+.light header {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.light header > div {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(203, 213, 225, 0.8) !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08) !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+.light header nav a,
+.light header a,
+.light header button {
+  color: #0B1221 !important;
+  font-weight: 500 !important;
+}
+
+.light header nav a:hover,
+.light header a:hover {
+  color: #334155 !important;
+}
+
+.light header button.bg-white\/10 {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0B1221 !important;
+}
+
+.light header button.bg-white\/10:hover {
+  background-color: #e2e8f0 !important;
+}
+
+/* Light Mode High Contrast #0B1221 Text Fixes */
+.light .text-white {
+  color: #0B1221 !important;
+}
+
+.light .text-gray-100,
+.light .text-gray-200 {
+  color: #0B1221 !important;
+}
+
+.light .text-gray-300,
+.light .text-gray-400 {
+  color: #334155 !important;
+}
+
+.light .text-gray-500 {
+  color: #475569 !important;
+}
+
+/* Footer Override - ALWAYS Pure White Text on Dark Obsidian (#09090B) in ALL Themes */
+footer,
+footer *,
+footer p,
+footer h4,
+footer a,
+footer span,
+footer li,
+.light footer,
+.light footer *,
+.light footer p,
+.light footer h4,
+.light footer a,
+.light footer span,
+.light footer li {
+  color: #ffffff !important;
+}
+
+.light footer {
+  background-color: #09090b !important;
+  border-top-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.light footer a:hover,
+footer a:hover {
+  opacity: 0.85 !important;
+}
+
+/* Tool Primitive Icons Override - Always Crisp White */
+.tool-icon,
+.tool-icon svg,
+.light .tool-icon,
+.light .tool-icon svg,
+.light div[style*="linear-gradient"] svg,
+.light div[style*="background"] svg {
+  color: #ffffff !important;
+}
+
+/* Light Mode Card & Container Backgrounds */
+.light .bg-white\/\[0\.03\],
+.light .bg-white\/\[0\.02\],
+.light .bg-white\/5,
+.light .bg-white\/10 {
+  background-color: #ffffff !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+}
+
+.light .border-white\/10,
+.light .border-white\/5,
+.light .border-white\/20 {
+  border-color: #cbd5e1 !important;
+}
+
+/* Footer Social Media Buttons - Always Dark Glass with Crisp White Icons */
+footer .bg-white\/10,
+.light footer .bg-white\/10 {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: none !important;
+}
+
+footer .bg-white\/10 svg,
+.light footer .bg-white\/10 svg,
+footer a[aria-label] svg,
+.light footer a[aria-label] svg {
+  color: #ffffff !important;
+}
+
+/* Community Card Overlay High Contrast Text & Icon Overrides */
+.community-card-overlay,
+.community-card-overlay p,
+.community-card-overlay span,
+.light .community-card-overlay,
+.light .community-card-overlay p,
+.light .community-card-overlay span {
+  color: #ffffff !important;
+}
+
+.light .community-card-overlay svg:not(.fill-\[\#FF4D5E\]) {
+  color: #ffffff !important;
+}
+
+.light .bg-\[\#0F1423\] {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+.light nav.bg-\[\#0B0F19\]\/80,
+.light nav.bg-\[\#0B0F19\]\/90,
+.light nav.bg-\[\#09090B\]\/90 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Light Mode Input & Textarea Fixes */
+.light input,
+.light textarea,
+.light select {
+  background-color: #ffffff !important;
+  color: #0B1221 !important;
+  border-color: #cbd5e1 !important;
+}
+
+.light input::placeholder,
+.light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Vibrant Coral Red #FF4D5E Dot & Accent Color */
+.text-\[\#FF495C\],
+.text-\[\#FF4D5E\],
+.text-indigo-400,
+.text-indigo-300,
+.text-purple-400,
+.text-purple-300 {
+  color: #FF4D5E !important;
+}
+
+.bg-\[\#FF495C\],
+.bg-\[\#FF4D5E\],
+.light .bg-\[\#FF495C\],
+.light .bg-\[\#FF4D5E\] {
+  background-color: #FF4D5E !important;
+  color: #ffffff !important;
+}
+
+.light .invert {
+  filter: invert(0) !important;
+}
+
+.light .brightness-200 {
+  filter: brightness(0.2) !important;
+}
+
+@theme {
+  --color-primary: #FF4D5E;
+}
+
+.reset-tw, .reset-tw * {
+  all: revert !important;
+}
+
+.cl-drawerRoot {
+  z-index: 10;
+}
+
+/* Keyframe Animations */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes rotateBorder {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes floatSmooth {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes circleSpotlightFlow {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+    opacity: 0.35;
+  }
+  25% {
+    transform: translate(220px, 100px) scale(1.25);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate(0px, 180px) scale(1.1);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translate(-220px, 80px) scale(1.3);
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+    opacity: 0.35;
+  }
+}
+
+.animate-circle-spotlight {
+  animation: circleSpotlightFlow 14s ease-in-out infinite;
+}
+
+@keyframes fadeInSoft {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.animate-fade-in-soft {
+  animation: fadeInSoft 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in-delay-1 {
+  animation: fadeInSoft 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.25s forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-delay-2 {
+  animation: fadeInSoft 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.45s forwards;
+  opacity: 0;
+}
+
+.animate-marquee {
+  display: inline-flex;
+  animation: marquee 25s linear infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 7s ease-in-out infinite;
+}
+
+.animate-float-smooth {
+  animation: floatSmooth 6s ease-in-out infinite;
+}
+
+/* Red Coral Shimmer Border Button */
+.unlumen-shimmer-btn {
+  position: relative;
+  overflow: hidden;
+  border-radius: 9999px;
+  padding: 1px;
+}
+
+.unlumen-shimmer-btn::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 300deg,
+    #FF4D5E 330deg,
+    #FF7A88 360deg
+  );
+  animation: rotateBorder 4s linear infinite;
+}
+
+.unlumen-shimmer-inner {
+  position: relative;
+  z-index: 1;
+  border-radius: 9999px;
+  background: #0b0f19;
+}
+
+.light .unlumen-shimmer-inner {
+  background: #ffffff;
+  color: #0B1221 !important;
+}
+
+.unlumen-hover-card {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.unlumen-hover-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 20px 40px -15px rgba(255, 77, 94, 0.25);
+  border-color: rgba(255, 77, 94, 0.5) !important;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
