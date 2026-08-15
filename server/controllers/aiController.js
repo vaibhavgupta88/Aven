@@ -50,44 +50,44 @@ export const generateDynamicATSReview = (resumeText = "") => {
 
   const formattedMissing = missingSkills.map((s) => `\`${s.toUpperCase()}\``).join(", ");
 
-  return `# 📄 ATS Resume Audit & Performance Analysis
+  return `# ATS Resume Audit and Performance Analysis
 
-## 🎯 Overall ATS Compatibility Score: **${overallScore} / 100**
+## Overall ATS Compatibility Score: **${overallScore} / 100**
 
 | Assessment Category | Score | Status | Key Recommendation |
 | :--- | :--- | :--- | :--- |
-| **Parseability & Document Structure** | **${parseScore} / 100** | ${parseScore >= 85 ? "🟢 Excellent" : "🟡 Good"} | ${hasEmail && hasPhone ? "Header text parsed cleanly" : "Ensure email and phone are top plain text"} |
-| **Keyword Density & Hard Skills** | **${keywordScore} / 100** | ${keywordScore >= 80 ? "🟢 Strong" : "🟡 Needs Expansion"} | ${detectedSkills.length > 3 ? "Expand category tags for cloud & tooling" : "Add missing technical framework keywords"} |
-| **Impact & Metric Quantification** | **${impactScore} / 100** | ${impactScore >= 80 ? "🟢 Impactful" : "🟡 Low Metrics"} | Found ${metricsCount} metric targets. Aim for metrics on 60%+ of bullets |
-| **Formatting & Header Hierarchy** | **${formatScore} / 100** | ${formatScore >= 85 ? "🟢 Clean" : "🟡 Refine Formatting"} | Standardize reverse-chronological date formatting |
+| **Parseability and Document Structure** | **${parseScore} / 100** | ${parseScore >= 85 ? "Excellent" : "Good"} | ${hasEmail && hasPhone ? "Header text parsed cleanly" : "Ensure email and phone are top plain text"} |
+| **Keyword Density and Hard Skills** | **${keywordScore} / 100** | ${keywordScore >= 80 ? "Strong" : "Needs Expansion"} | ${detectedSkills.length > 3 ? "Expand category tags for cloud and tooling" : "Add missing technical framework keywords"} |
+| **Impact and Metric Quantification** | **${impactScore} / 100** | ${impactScore >= 80 ? "Impactful" : "Low Metrics"} | Found ${metricsCount} metric targets. Aim for metrics on 60%+ of bullets |
+| **Formatting and Header Hierarchy** | **${formatScore} / 100** | ${formatScore >= 85 ? "Clean" : "Refine Formatting"} | Standardize reverse-chronological date formatting |
 
 ---
 
-## 🔍 Detailed Category Breakdown
+## Detailed Category Breakdown
 
-### 1. 📧 Contact Information & Header Audit
-- **Email Detected**: ${hasEmail ? "🟢 **Passed**" : "🔴 **Missing or unparsed**"}
-- **Phone Number Detected**: ${hasPhone ? "🟢 **Passed**" : "🟡 **Not found in top header**"}
-- **LinkedIn / Portfolio Links**: ${hasLinkedin || hasGithub ? "🟢 **Detected**" : "🟡 **Recommended**: Add plain text \`linkedin.com/in/yourname\`"}
+### 1. Contact Information and Header Audit
+- **Email Detected**: ${hasEmail ? "**Passed**" : "**Missing or unparsed**"}
+- **Phone Number Detected**: ${hasPhone ? "**Passed**" : "**Not found in top header**"}
+- **LinkedIn or Portfolio Links**: ${hasLinkedin || hasGithub ? "**Detected**" : "**Recommended**: Add plain text \`linkedin.com/in/yourname\`"}
 
-### 2. ⚡ Work Experience & Action Verb Impact
+### 2. Work Experience and Action Verb Impact
 - **Action Verbs Detected**: ${detectedVerbs.length > 0 ? detectedVerbs.map((v) => `*${v}*`).join(", ") : "*managed, developed, built*"}
-- **Quantification Analysis**: ${metricsCount > 0 ? `Identified **${metricsCount}** quantified metric statements.` : "🔴 **Zero quantifiable metrics detected.** Add exact numbers, percentages, or dollar values."}
+- **Quantification Analysis**: ${metricsCount > 0 ? `Identified **${metricsCount}** quantified metric statements.` : "**Zero quantifiable metrics detected.** Add exact numbers, percentages, or dollar values."}
 
-#### 🛠️ Recommended Line Rewrite based on your resume:
-- ❌ **Current Line**: "${sampleLine.slice(0, 95)}..."
-- ✅ **ATS Optimized Rewrite**: "${sampleLine.replace(/^[^a-zA-Z]+/, "")} — resulting in a 35% reduction in latency and enhanced system reliability across key modules."
+#### Recommended Line Rewrite based on your resume:
+- **Current Line**: "${sampleLine.slice(0, 95)}..."
+- **ATS Optimized Rewrite**: "${sampleLine.replace(/^[^a-zA-Z]+/, "")} - resulting in a 35% reduction in latency and enhanced system reliability across key modules."
 
-### 3. 🛠️ Skill Keyword Breakdown
+### 3. Skill Keyword Breakdown
 - **Detected Skills in your Resume**: ${formattedSkills}
-- **Missing High-Impact Industry Keywords to Consider**: ${formattedMissing}
+- **Missing High Impact Industry Keywords to Consider**: ${formattedMissing}
 
 ---
 
-## 🚀 Priority Action Plan (Top 3 Fixes)
+## Priority Action Plan
 
 1. **Quantify Bullet Points**: Add numerical metrics (percentage increases, time saved, revenue generated) to at least 60% of your experience bullet points.
-2. **Inject Missing Technical Keywords**: Add a dedicated "Technical Skills" section grouped into categories: *Languages*, *Frameworks*, *Databases & Cloud*, *Tools*.
+2. **Inject Missing Technical Keywords**: Add a dedicated "Technical Skills" section grouped into categories: *Languages*, *Frameworks*, *Databases and Cloud*, *Tools*.
 3. **Refine Executive Summary**: Craft a punchy 3-line professional summary highlighting your core expertise and top achievements at the top of your resume.`;
 };
 
@@ -128,13 +128,17 @@ const callGeminiWithFallback = async (params) => {
 
 ${cleanTopic} is rapidly revolutionizing the modern digital landscape. From accelerating workflow efficiency to expanding creative horizons, innovative applications of this field are empowering professionals across diverse industries.
 
-## Key Highlights & Innovations
+## Overview
+
+Key developments in ${cleanTopic} continue to automate complex tasks and streamline modern digital workflows across global organizations.
+
+## Key Insights and Innovations
 
 - **Automated Workflow Optimization**: Streamlining complex manual tasks into fast, intelligent processes.
-- **Enhanced Creativity & Synthesis**: Empowering creators with instant content generation, analysis, and strategic insights.
+- **Enhanced Creativity and Synthesis**: Empowering creators with instant content generation, analysis, and strategic insights.
 - **Scalable Digital Operations**: Driving productivity through data-driven decisions and seamless automation.
 
-## Looking Ahead
+## Conclusion
 
 As technology advances, integrating ${cleanTopic} into day-to-day operations will continue to unlock new possibilities, making workflows smarter, faster, and more impactful than ever before.`;
 
@@ -194,7 +198,7 @@ export const generateArticle = async (req, res) => {
         {
           role: "system",
           content:
-            "You are a professional article writer. Write a comprehensive, well-structured, complete article with headings, paragraphs, and a clear conclusion. Every sentence and section must be 100% complete. Never truncate or leave the response incomplete.",
+            "You are a professional article writer. Write a comprehensive, well-structured, complete article with consistent standard markdown headings (# for main title, ## for major sections like Overview, Key Insights and Innovations, Conclusion). Do NOT use emojis, special decorative symbols, or non-standard characters in headings or body text. Every sentence and section must be 100% complete.",
         },
         { role: "user", content: prompt },
       ],
@@ -247,7 +251,7 @@ export const generateBlogTitle = async (req, res) => {
         {
           role: "system",
           content:
-            "You are an expert copywriter and content strategist. Generate 5 catchy, high-converting blog post titles based on the user's topic. Format them strictly as a numbered list from 1 to 5.",
+            "You are an expert copywriter and content strategist. Generate 5 catchy, high-converting blog post titles based on the user's topic. Format them strictly as a numbered list from 1 to 5. Do NOT use emojis or special symbols in the titles.",
         },
         { role: "user", content: prompt },
       ],
@@ -495,13 +499,12 @@ export const resumeReview = async (req, res) => {
       messages: [
         {
           role: "system",
-          content: `You are an elite ATS resume auditor and career strategist. Note: Current year is ${currentYear}. Analyze the resume thoroughly and output a highly detailed, professional report using clean Markdown with the following exact structure:
-1. Overall ATS Compatibility Score (out of 100) with a detailed breakdown table comparing Parseability, Keyword Density, Metric Quantification, and Layout Consistency.
-2. Contact Information & Header Audit (Status, Findings, Tips).
-3. Work Experience & Action Verb Impact (with specific Before/After bullet point rewrite examples).
-4. Technical Keyword & Skill Gaps (High-impact missing keywords).
-5. ATS Parser Safety Checklist.
-6. Priority Action Plan (Top 3 actionable fixes).`,
+          content: `You are an ATS resume auditor and career strategist. Note: Current year is ${currentYear}. Analyze the resume thoroughly and output a highly detailed, professional report using clean Markdown with NO emojis or special symbols. Use consistent standard headings (# for title, ## for major sections, ### for subsections):
+1. Overall ATS Compatibility Score (out of 100) with a breakdown table comparing Parseability, Keyword Density, Metric Quantification, and Layout Consistency.
+2. Contact Information and Header Audit.
+3. Work Experience and Action Verb Impact (with Before and After bullet point rewrites).
+4. Skill Keyword Breakdown (missing technical skills).
+5. Priority Action Plan.`,
         },
         { role: "user", content: prompt },
       ],
