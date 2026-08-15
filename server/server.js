@@ -32,8 +32,11 @@ app.use((req, res, next) => {
 
 // Vercel serverless URL rewrite path normalizer
 app.use((req, res, next) => {
-  if (req.url.startsWith("/api/index.js")) {
-    req.url = req.url.replace("/api/index.js", "") || "/";
+  if (req.url.includes("api/index.js")) {
+    req.url = req.url.replace(/\/api\/index\.js\/?/, "/");
+  }
+  if (!req.url.startsWith("/")) {
+    req.url = "/" + req.url;
   }
   next();
 });
@@ -50,15 +53,18 @@ try {
 app.get("/", (req, res) => res.send("Server is Live!"));
 app.get("/api", (req, res) => res.send("Server API is Live!"));
 
-// Primary API routes
-app.use("/api/stripe", stripeRouter);
-app.use("/api/ai", aiRouter);
-app.use("/api/user", userRouter);
+// Multi-path API router mounts (matches both /api/ai and /ai, etc.)
+app.use(["/api/stripe", "/stripe"], stripeRouter);
+app.use(["/api/ai", "/ai"], aiRouter);
+app.use(["/api/user", "/user"], userRouter);
 
-// Fallback API routes (without /api prefix)
-app.use("/stripe", stripeRouter);
-app.use("/ai", aiRouter);
-app.use("/user", userRouter);
+// Global Catch-all to prevent 404 status code (no body)
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Route not found: ${req.method} ${req.url}`,
+  });
+});
 
 // Global Error Handler
 app.use((err, req, res, next) => {
