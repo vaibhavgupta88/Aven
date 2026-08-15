@@ -77,9 +77,9 @@ const CreationItem = ({ item, onDelete }) => {
       onClick={() => setExpanded(!expanded)}
       className="p-4 max-w-5xl text-sm bg-white/[0.03] backdrop-blur-xl border border-white/10 hover:border-white/20 rounded-xl transition-all duration-200 cursor-pointer shadow-sm"
     >
-      <div className="flex justify-between items-center gap-4">
-        <div>
-          <h3 className="font-semibold text-white text-base">{item.prompt}</h3>
+      <div className="flex justify-between items-center gap-3 sm:gap-4">
+        <div className="min-w-0 flex-1">
+          <h3 className="font-semibold text-white text-sm sm:text-base break-words">{item.prompt}</h3>
           <p className="text-xs text-gray-400 mt-1">
             {new Date(item.created_at).toLocaleDateString("en-US", {
               month: "short",

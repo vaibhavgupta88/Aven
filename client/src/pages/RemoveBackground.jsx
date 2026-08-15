@@ -59,15 +59,15 @@ const RemoveBackground = () => {
   };
 
   return (
-    <div className="h-full overflow-y-scroll p-6 flex items-start flex-wrap gap-6 text-gray-200 tracking-[-0.02em]">
+    <div className="h-full overflow-y-auto p-4 sm:p-6 flex items-start flex-wrap lg:flex-nowrap gap-6 text-gray-200 tracking-[-0.02em]">
       {/* Left col */}
       <form
         onSubmit={onSubmitHandler}
-        className="w-full max-w-lg p-6 bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/10 shadow-lg"
+        className="w-full lg:flex-1 p-4 sm:p-6 bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/10 shadow-lg"
       >
         <div className="flex items-center gap-3">
           <Sparkles className="w-6 h-6 text-[#FF4D5E] shrink-0" />
-          <h1 className="text-xl font-bold text-white">Background Removal</h1>
+          <h1 className="text-lg sm:text-xl font-bold text-white">Background Removal</h1>
         </div>
 
         <p className="mt-6 text-xs font-semibold uppercase tracking-wider text-gray-400">Upload Image</p>
@@ -94,7 +94,7 @@ const RemoveBackground = () => {
       </form>
 
       {/* Right col */}
-      <div className="w-full max-w-lg p-6 bg-white/[0.03] backdrop-blur-xl rounded-2xl flex flex-col border border-white/10 shadow-lg min-h-96">
+      <div className="w-full lg:flex-1 p-4 sm:p-6 bg-white/[0.03] backdrop-blur-xl rounded-2xl flex flex-col border border-white/10 shadow-lg min-h-80 lg:min-h-96">
         <div className="flex items-center gap-3 border-b border-white/10 pb-4">
           <Eraser className="w-5 h-5 text-[#FF4D5E]" />
           <h1 className="text-xl font-bold text-white">Processed Image</h1>

@@ -15,18 +15,18 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative min-h-screen pt-44 pb-24 px-4 sm:px-8 xl:px-12 flex flex-col items-center justify-center overflow-hidden bg-[#09090B] tracking-[-0.02em]">
+    <section className="relative min-h-screen pt-28 sm:pt-44 pb-20 sm:pb-24 px-4 sm:px-8 xl:px-12 flex flex-col items-center justify-center overflow-hidden bg-[#09090B] tracking-[-0.02em]">
       {/* Circular Flowing Red Spotlight Orb Spanning Hero Section */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden flex items-center justify-center">
         <Spotlight
-          className="top-10 w-[550px] sm:w-[750px] h-[550px] sm:h-[750px] animate-circle-spotlight"
+          className="top-10 w-[350px] sm:w-[750px] h-[350px] sm:h-[750px] animate-circle-spotlight"
           fill="#FF4D5E"
         />
       </div>
 
       {/* Hero Headline with Soft Fade-In Animation */}
       <div className="text-center max-w-4xl mx-auto z-10">
-        <h1 className="text-5xl sm:text-7xl md:text-8xl font-semibold tracking-[-0.03em] text-white text-center leading-[1.12] animate-fade-in-soft">
+        <h1 className="text-4xl sm:text-7xl md:text-8xl font-semibold tracking-[-0.03em] text-white text-center leading-[1.12] animate-fade-in-soft">
           Craft your AI with feeling<span className="text-[#FF4D5E]">.</span>
         </h1>
 

@@ -41,10 +41,10 @@ const Dashboard = () => {
   }, [getDashboardData]);
 
   return (
-    <div className="h-full overflow-y-scroll p-6 text-gray-200 tracking-[-0.02em]">
-      <div className="flex justify-start gap-6 flex-wrap">
+    <div className="h-full overflow-y-auto p-4 sm:p-6 text-gray-200 tracking-[-0.02em]">
+      <div className="flex justify-start gap-4 sm:gap-6 flex-wrap">
         {/* Total Creations Card */}
-        <div className="flex justify-between items-center w-72 p-5 bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/10 shadow-sm">
+        <div className="flex justify-between items-center w-full sm:w-72 p-5 bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/10 shadow-sm">
           <div>
             <p className="text-xs font-medium text-gray-400">Total Creations</p>
             <h2 className="text-2xl font-bold text-white mt-1">{creations.length}</h2>
@@ -54,7 +54,7 @@ const Dashboard = () => {
         </div>
 
         {/* Active Plan Card */}
-        <div className="flex justify-between items-center w-72 p-5 bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/10 shadow-sm">
+        <div className="flex justify-between items-center w-full sm:w-72 p-5 bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/10 shadow-sm">
           <div>
             <p className="text-xs font-medium text-gray-400">Active Plan</p>
             <h2 className="text-2xl font-bold text-white mt-1">

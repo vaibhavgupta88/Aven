@@ -10,22 +10,22 @@ const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <header className="fixed top-5 left-0 right-0 z-50 flex justify-center px-4 pointer-events-auto">
-      <div className="w-full max-w-5xl rounded-full bg-[#09090B]/60 backdrop-blur-2xl border border-white/15 px-6 py-3 flex items-center justify-between shadow-2xl transition-all duration-300">
+    <header className="fixed top-3 sm:top-5 left-0 right-0 z-50 flex justify-center px-3 sm:px-4 pointer-events-auto">
+      <div className="w-full max-w-5xl rounded-full bg-[#09090B]/80 backdrop-blur-2xl border border-white/15 px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between shadow-2xl transition-all duration-300">
         {/* Left Side: Brand Logo + Nav Links */}
-        <div className="flex items-center gap-8 md:gap-12">
+        <div className="flex items-center gap-4 sm:gap-8 md:gap-12">
           {/* Brand Logo with 1.2s Smooth Slow Hover Animation */}
           <Link
             to="/"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="flex items-center gap-2 group cursor-pointer"
           >
-            <span className="text-xl font-bold tracking-[-0.03em] text-white transition-transform duration-[1200ms] ease-out group-hover:scale-105 inline-block">
+            <span className="text-lg sm:text-xl font-bold tracking-[-0.03em] text-white transition-transform duration-[1200ms] ease-out group-hover:scale-105 inline-block">
               Aven<span className="text-[#FF4D5E]">.</span>
             </span>
           </Link>
 
-          {/* Navigation Links Shifted Left */}
+          {/* Navigation Links */}
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-300">
             <a
               href="#tools"
@@ -49,13 +49,13 @@ const Navbar = () => {
         </div>
 
         {/* Right Side: Action Controls & User Account */}
-        <div className="flex items-center gap-4">
-          {/* Social Icons */}
+        <div className="flex items-center gap-2.5 sm:gap-4">
+          {/* Social Icons (Hidden on extra-small screens) */}
           <a
             href="https://github.com"
             target="_blank"
             rel="noreferrer"
-            className="text-gray-400 hover:text-white transition p-1"
+            className="hidden xs:inline-flex text-gray-400 hover:text-white transition p-1"
             aria-label="GitHub"
           >
             <Github className="w-4 h-4" />
@@ -64,7 +64,7 @@ const Navbar = () => {
             href="https://x.com"
             target="_blank"
             rel="noreferrer"
-            className="text-gray-400 hover:text-white transition p-1"
+            className="hidden xs:inline-flex text-gray-400 hover:text-white transition p-1"
             aria-label="Twitter"
           >
             <Twitter className="w-4 h-4" />

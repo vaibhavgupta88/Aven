@@ -37,11 +37,20 @@ const Sidebar = ({ sidebar, setSidebar }) => {
     user?.privateMetadata?.plan === "premium";
 
   return (
-    <aside
-      className={`w-64 bg-[#09090B] border-r border-white/10 flex flex-col justify-between items-center max-sm:absolute top-16 bottom-0 ${
-        sidebar ? "translate-x-0" : "max-sm:-translate-x-full"
-      } transition-all duration-300 ease-in-out z-30`}
-    >
+    <>
+      {/* Mobile Backdrop */}
+      {sidebar && (
+        <div
+          onClick={() => setSidebar(false)}
+          className="fixed inset-0 top-16 bg-black/70 backdrop-blur-sm z-30 sm:hidden"
+        />
+      )}
+
+      <aside
+        className={`w-64 bg-[#09090B] border-r border-white/10 flex flex-col justify-between items-center fixed sm:relative top-16 sm:top-0 bottom-0 left-0 ${
+          sidebar ? "translate-x-0" : "-translate-x-full sm:translate-x-0"
+        } transition-transform duration-300 ease-in-out z-40`}
+      >
       <div className="my-6 w-full px-4">
         {/* User Card with Plan Status Badge */}
         <div className="flex items-center justify-between gap-3 p-3 bg-white/5 border border-white/10 rounded-xl mb-6">
@@ -125,6 +134,7 @@ const Sidebar = ({ sidebar, setSidebar }) => {
         />
       </div>
     </aside>
+  </>
   );
 };
 

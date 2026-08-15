@@ -93,13 +93,13 @@ const Community = () => {
   }
 
   return (
-    <div className="flex-1 h-full flex flex-col gap-4 p-6 text-gray-200 tracking-[-0.02em]">
+    <div className="flex-1 h-full flex flex-col gap-4 p-4 sm:p-6 text-gray-200 tracking-[-0.02em]">
       <div className="flex items-center gap-3">
         <Users className="w-6 h-6 text-[#FF4D5E]" />
-        <h1 className="text-xl font-bold text-white">Community Gallery</h1>
+        <h1 className="text-lg sm:text-xl font-bold text-white">Community Gallery</h1>
       </div>
 
-      <div className="bg-white/[0.03] backdrop-blur-xl h-full w-full rounded-2xl p-6 overflow-y-scroll border border-white/10">
+      <div className="bg-white/[0.03] backdrop-blur-xl h-full w-full rounded-2xl p-4 sm:p-6 overflow-y-auto border border-white/10">
         {creations.length === 0 ? (
           <div className="h-full min-h-[400px] flex flex-col justify-center items-center text-center p-6">
             <div className="w-16 h-16 bg-[#FF4D5E]/10 text-[#FF4D5E] border border-[#FF4D5E]/20 rounded-full flex items-center justify-center mb-4">
