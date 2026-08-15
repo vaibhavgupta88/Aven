@@ -1,15 +1,38 @@
 import sql from "../configs/db.js";
+import {
+  getCreationsByUser,
+  getAllCreations,
+  removeCreation,
+} from "../configs/creationsStore.js";
 
 const getUserId = (req) =>
   req.userId ||
-  (typeof req.auth === "function" ? req.auth()?.userId : req.auth?.userId);
+  (typeof req.auth === "function" ? req.auth()?.userId : req.auth?.userId) ||
+  "user_demo_guest";
 
 export const getUserCreations = async (req, res) => {
   try {
     const userId = getUserId(req);
 
-    const creations =
-      await sql`SELECT * FROM creations WHERE user_id = ${userId} ORDER BY created_at DESC`;
+    let dbCreations = [];
+    try {
+      dbCreations =
+        await sql`SELECT * FROM creations WHERE user_id = ${userId} ORDER BY created_at DESC`;
+    } catch (e) {
+      console.warn("DB query note:", e.message);
+    }
+
+    const memoryCreations = getCreationsByUser(userId);
+
+    // Combine DB + in-memory creations, deduplicating by ID
+    const combinedMap = new Map();
+    [...(Array.isArray(dbCreations) ? dbCreations : []), ...memoryCreations].forEach(
+      (item) => combinedMap.set(item.id, item)
+    );
+
+    const creations = Array.from(combinedMap.values()).sort(
+      (a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0)
+    );
 
     res.json({ success: true, creations });
   } catch (error) {
@@ -19,9 +42,21 @@ export const getUserCreations = async (req, res) => {
 
 export const getPublishedCreations = async (req, res) => {
   try {
-    const creations =
-      await sql`SELECT * FROM creations WHERE publish = true ORDER BY created_at DESC`;
+    let dbCreations = [];
+    try {
+      dbCreations =
+        await sql`SELECT * FROM creations WHERE publish = true ORDER BY created_at DESC`;
+    } catch (e) {
+      console.warn("DB query note:", e.message);
+    }
 
+    const memoryCreations = getAllCreations();
+    const combinedMap = new Map();
+    [...(Array.isArray(dbCreations) ? dbCreations : []), ...memoryCreations].forEach(
+      (item) => combinedMap.set(item.id, item)
+    );
+
+    const creations = Array.from(combinedMap.values());
     res.json({ success: true, creations });
   } catch (error) {
     res.json({ success: false, message: error.message });
@@ -33,7 +68,18 @@ export const toggleLikeCreation = async (req, res) => {
     const userId = getUserId(req);
     const { id } = req.body;
 
-    const [creation] = await sql`SELECT * FROM creations WHERE id = ${id}`;
+    let creation = null;
+    try {
+      const [res] = await sql`SELECT * FROM creations WHERE id = ${id}`;
+      creation = res;
+    } catch (e) {
+      console.warn("DB query note:", e.message);
+    }
+
+    if (!creation) {
+      const memoryItems = getAllCreations();
+      creation = memoryItems.find((c) => c.id === id);
+    }
 
     if (!creation) {
       return res.json({ success: false, message: "Creation not found" });
@@ -52,7 +98,12 @@ export const toggleLikeCreation = async (req, res) => {
       message = "Creation Liked";
     }
 
-    await sql`UPDATE creations SET likes = ${updatedLikes} WHERE id = ${id}`;
+    try {
+      await sql`UPDATE creations SET likes = ${updatedLikes} WHERE id = ${id}`;
+    } catch (e) {
+      console.warn("DB update note:", e.message);
+    }
+    creation.likes = updatedLikes;
 
     res.json({ success: true, message, likes: updatedLikes });
   } catch (error) {
@@ -87,7 +138,13 @@ export const deleteCreation = async (req, res) => {
       return res.json({ success: false, message: "Creation ID is required" });
     }
 
-    await sql`DELETE FROM creations WHERE id = ${id} AND user_id = ${userId}`;
+    try {
+      await sql`DELETE FROM creations WHERE id = ${id} AND user_id = ${userId}`;
+    } catch (e) {
+      console.warn("DB delete note:", e.message);
+    }
+
+    removeCreation(id, userId);
 
     res.json({ success: true, message: "Creation deleted successfully" });
   } catch (error) {

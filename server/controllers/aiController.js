@@ -4,6 +4,7 @@ import { clerkClient } from "@clerk/express";
 import axios from "axios";
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
+import { saveCreation } from "../configs/creationsStore.js";
 
 
 const AI = new OpenAI({
@@ -65,6 +66,8 @@ export const generateArticle = async (req, res) => {
     });
 
     const content = response.choices[0].message.content;
+
+    saveCreation(userId, prompt, content, "article");
 
     try {
       await sql` INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${prompt}, ${content}, 'article') `;
