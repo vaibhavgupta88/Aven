@@ -26,4 +26,19 @@ export const getApiBaseUrl = () => {
 
 axios.defaults.baseURL = getApiBaseUrl();
 
+// Global Axios Interceptor for network and server error handling
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const serverMessage = error.response?.data?.message;
+    if (serverMessage) {
+      error.message = serverMessage;
+    } else if (error.code === "ERR_NETWORK" || !error.response) {
+      error.message = "Network error: Unable to connect to server. Please check your connection.";
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default axios;
+

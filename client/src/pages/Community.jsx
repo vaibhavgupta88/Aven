@@ -26,7 +26,7 @@ const Community = () => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || error.message);
     }
 
     setLoading(false);
@@ -71,7 +71,7 @@ const Community = () => {
       }
     } catch (error) {
       console.error("Like error:", error);
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || error.message);
       await fetchCreations();
     }
   };
