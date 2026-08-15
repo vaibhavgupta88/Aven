@@ -11,6 +11,75 @@ const AI = new OpenAI({
   baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
 });
 
+export const generateSmartBlogTitles = (rawTopic = "", category = "General") => {
+  const topic = (rawTopic || "General Topic").trim();
+  const capTopic = topic.charAt(0).toUpperCase() + topic.slice(1);
+  const cat = (category || "General").toLowerCase();
+
+  let titles = [];
+
+  if (cat.includes("tech")) {
+    titles = [
+      `1. The Complete Developer's Guide to ${capTopic} in ${new Date().getFullYear()}`,
+      `2. 5 Key Architecture Trends Shaping the Future of ${capTopic}`,
+      `3. How ${capTopic} is Revolutionizing Modern Software Development`,
+      `4. Best Practices for Scaling ${capTopic} in Enterprise Applications`,
+      `5. Why ${capTopic} is Essential for Next-Gen Digital Systems`,
+    ];
+  } else if (cat.includes("busines") || cat.includes("finance")) {
+    titles = [
+      `1. The Executive Playbook: Strategic Insights into ${capTopic}`,
+      `2. How ${capTopic} is Driving ROI and Business Growth in ${new Date().getFullYear()}`,
+      `3. 5 Proven Frameworks to Master ${capTopic} for Market Leadership`,
+      `4. Key Challenges and Opportunities in ${capTopic} Today`,
+      `5. The Economic Impact of ${capTopic}: What Industry Leaders Need to Know`,
+    ];
+  } else if (cat.includes("health") || cat.includes("fitness")) {
+    titles = [
+      `1. The Essential Science-Backed Guide to ${capTopic}`,
+      `2. 5 Daily Habits to Master ${capTopic} for Better Wellness`,
+      `3. Common Myths About ${capTopic} Debunked by Experts`,
+      `4. How ${capTopic} Transforms Long-Term Personal Well-Being`,
+      `5. 7 Actionable Steps to Improve ${capTopic} Starting Today`,
+    ];
+  } else if (cat.includes("travel")) {
+    titles = [
+      `1. The Ultimate Travel Guide: Exploring ${capTopic}`,
+      `2. 10 Hidden Gems and Must-Visit Highlights of ${capTopic}`,
+      `3. How to Experience ${capTopic} Like a Local: Tips and Itineraries`,
+      `4. Essential Travel Tips for Your Next Journey to ${capTopic}`,
+      `5. Why ${capTopic} Should Be on Your Travel Bucket List This Year`,
+    ];
+  } else if (cat.includes("food") || cat.includes("culinary")) {
+    titles = [
+      `1. The Ultimate Culinary Guide to ${capTopic}`,
+      `2. 5 Essential Recipes and Secrets to Master ${capTopic}`,
+      `3. The Rich History and Flavors Behind ${capTopic}`,
+      `4. How to Elevate ${capTopic} with Authentic Ingredients`,
+      `5. Top Culinary Trends Influencing ${capTopic} Right Now`,
+    ];
+  } else if (cat.includes("educat")) {
+    titles = [
+      `1. Understanding ${capTopic}: A Comprehensive Learning Guide`,
+      `2. 5 Key Concepts to Master ${capTopic} Faster`,
+      `3. The Historical Evolution and Modern Significance of ${capTopic}`,
+      `4. Practical Strategies for Teaching and Studying ${capTopic}`,
+      `5. Why Learning About ${capTopic} Matters More Than Ever`,
+    ];
+  } else {
+    // General / History / Universal
+    titles = [
+      `1. The Comprehensive Overview of ${capTopic}: Past, Present, and Future`,
+      `2. 5 Fascinating Facts and Key Milestones in ${capTopic}`,
+      `3. Exploring the Historical Impact and Legacy of ${capTopic}`,
+      `4. Key Lessons and Insights Learned from ${capTopic}`,
+      `5. Why ${capTopic} Remains a Pivotal Subject in Modern Times`,
+    ];
+  }
+
+  return titles.join("\n");
+};
+
 export const generateDynamicATSReview = (resumeText = "") => {
   const text = (resumeText || "").trim();
   const lowerText = text.toLowerCase();
@@ -94,7 +163,8 @@ export const generateDynamicATSReview = (resumeText = "") => {
 const callGeminiWithFallback = async (params) => {
   const apiKey = process.env.GEMINI_API_KEY;
   const userPrompt = params.messages?.find((m) => m.role === "user")?.content || "Artificial Intelligence";
-  
+  const userCategory = params.messages?.find((m) => m.role === "user")?.category || "General";
+
   let cleanTopic = userPrompt
     .replace(/^Generate a blog title for the keyword\s+/i, "")
     .replace(/\s+in the category\s+.*$/i, "")
@@ -144,12 +214,6 @@ Key developments in ${cleanTopic} continue to automate complex tasks and streaml
 
 As technology advances, integrating ${cleanTopic} into day-to-day operations will continue to unlock new possibilities, making workflows smarter, faster, and more impactful than ever before.`;
 
-  const fallbackBlogTitles = `1. The Ultimate Guide to ${cleanTopic} in ${new Date().getFullYear()}
-2. 5 Game-Changing Insights About ${cleanTopic} You Need to Know
-3. How ${cleanTopic} is Transforming the Future of Technology
-4. Master ${cleanTopic}: Top Strategies for Success
-5. Why ${cleanTopic} Matters Now More Than Ever`;
-
   const isBlogTitle = params.messages?.some(
     (m) =>
       m.content?.toLowerCase().includes("blog") ||
@@ -162,7 +226,9 @@ As technology advances, integrating ${cleanTopic} into day-to-day operations wil
   );
 
   let content = fallbackArticle;
-  if (isBlogTitle) content = fallbackBlogTitles;
+  if (isBlogTitle) {
+    content = generateSmartBlogTitles(cleanTopic, userCategory);
+  }
   if (isResumeReview) {
     const resumeText = userPrompt.replace(/^Review the following resume.*?:\s*/is, "");
     content = generateDynamicATSReview(resumeText);
@@ -242,7 +308,7 @@ export const generateArticle = async (req, res) => {
 export const generateBlogTitle = async (req, res) => {
   try {
     const userId = getUserId(req);
-    const { prompt } = req.body;
+    const { prompt, category } = req.body;
     const plan = req.plan;
     const free_usage = req.free_usage;
 
@@ -257,10 +323,9 @@ export const generateBlogTitle = async (req, res) => {
       messages: [
         {
           role: "system",
-          content:
-            "You are an expert copywriter and content strategist. Generate 5 catchy, high-converting blog post titles based on the user's topic. Format them strictly as a numbered list from 1 to 5. Do NOT use emojis or special symbols in the titles.",
+          content: `You are an expert copywriter and content strategist. Generate 5 catchy, high-converting blog post titles for topic "${prompt}" in category "${category || "General"}". Format them strictly as a numbered list from 1 to 5. Do NOT use emojis or special symbols in the titles.`,
         },
-        { role: "user", content: prompt },
+        { role: "user", content: prompt, category },
       ],
       temperature: 0.7,
       max_tokens: 1500,
