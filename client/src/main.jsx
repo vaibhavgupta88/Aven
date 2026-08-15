@@ -8,7 +8,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 
 const PUBLISHABLE_KEY =
   import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ||
-  "pk_live_Y2xlcmsuYXZlbi1tdS52ZXJjZWwuYXBwJA";
+  "pk_test_bmljZS1zbmFwcGVyLTQ2LmNsZXJrLmFjY291bnRzLmRldiQ";
 
 createRoot(document.getElementById("root")).render(
   <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
