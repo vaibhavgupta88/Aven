@@ -30,11 +30,18 @@ const BlogTitles = () => {
       setLoading(true);
       const prompt = `Generate a blog title for the keyword ${input} in the category ${selectedCategory}`;
 
+      let token = "";
+      try {
+        token = await getToken();
+      } catch (tokenErr) {
+        console.warn("Token fetch note:", tokenErr);
+      }
+
       const { data } = await axios.post(
         "/api/ai/generate-blog-title",
         { prompt },
         {
-          headers: { Authorization: `Bearer ${await getToken()}` },
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
         }
       );
 

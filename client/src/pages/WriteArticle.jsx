@@ -25,11 +25,18 @@ const WriteArticle = () => {
       setLoading(true);
       const prompt = `Write an article about ${input} in ${selectedLength.text}`;
 
+      let token = "";
+      try {
+        token = await getToken();
+      } catch (tokenErr) {
+        console.warn("Token fetch note:", tokenErr);
+      }
+
       const { data } = await axios.post(
         "/api/ai/generate-article",
         { prompt, length: selectedLength.length },
         {
-          headers: { Authorization: `Bearer ${await getToken()}` },
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
         }
       );
 
