@@ -352,13 +352,14 @@ const callGeminiWithFallback = async (params) => {
 
   const isBlogTitle = params.messages?.some(
     (m) =>
-      m.content?.toLowerCase().includes("blog") ||
-      m.content?.toLowerCase().includes("titles") ||
+      m.content?.toLowerCase().includes("blog post titles") ||
+      m.content?.toLowerCase().includes("catchy, high-converting") ||
       m.content?.toLowerCase().includes("copywriter")
   );
-  const isResumeReview = params.messages?.some((m) =>
-    m.content?.toLowerCase().includes("ats resume") ||
-    m.content?.toLowerCase().includes("resume")
+  const isResumeReview = params.messages?.some(
+    (m) =>
+      m.content?.toLowerCase().includes("ats resume auditor") ||
+      m.content?.toLowerCase().includes("resume content")
   );
 
   let content = fallbackArticle;
