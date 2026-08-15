@@ -30,6 +30,14 @@ app.use((req, res, next) => {
   next();
 });
 
+// Vercel serverless URL rewrite path normalizer
+app.use((req, res, next) => {
+  if (req.url.startsWith("/api/index.js")) {
+    req.url = req.url.replace("/api/index.js", "") || "/";
+  }
+  next();
+});
+
 app.use(express.json());
 
 // Clerk authentication middleware
@@ -42,9 +50,15 @@ try {
 app.get("/", (req, res) => res.send("Server is Live!"));
 app.get("/api", (req, res) => res.send("Server API is Live!"));
 
+// Primary API routes
 app.use("/api/stripe", stripeRouter);
 app.use("/api/ai", aiRouter);
 app.use("/api/user", userRouter);
+
+// Fallback API routes (without /api prefix)
+app.use("/stripe", stripeRouter);
+app.use("/ai", aiRouter);
+app.use("/user", userRouter);
 
 // Global Error Handler
 app.use((err, req, res, next) => {
