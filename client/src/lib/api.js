@@ -7,21 +7,24 @@ import axios from "axios";
 export const getApiBaseUrl = () => {
   const envUrl = import.meta.env.VITE_BASE_URL;
 
-  // 1. If VITE_BASE_URL is set to a real production URL (e.g. https://aven-server.vercel.app), use it
-  if (envUrl && !envUrl.includes("localhost") && !envUrl.includes("127.0.0.1")) {
-    return envUrl;
+  // 1. If VITE_BASE_URL is explicitly set, use it (removing any trailing slash)
+  if (envUrl && envUrl.trim() !== "") {
+    return envUrl.trim().replace(/\/+$/, "");
   }
 
-  // 2. If running locally in browser and accessing via local IP or mobile Wi-Fi
+  // 2. If running in local network dev over Wi-Fi / local IP (e.g. 10.x.x.x, 192.168.x.x, 172.x.x.x)
   if (typeof window !== "undefined" && window.location.hostname) {
     const host = window.location.hostname;
-    if (host !== "localhost" && host !== "127.0.0.1") {
+    const isLocalNetworkIp =
+      /^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|.*\.local$)/.test(host);
+
+    if (isLocalNetworkIp) {
       return `http://${host}:3000`;
     }
   }
 
-  // 3. Fallback for desktop dev (Vite server proxying)
-  return envUrl && envUrl.startsWith("http") ? envUrl : "";
+  // 3. Fallback for relative requests
+  return "";
 };
 
 axios.defaults.baseURL = getApiBaseUrl();
