@@ -14,7 +14,11 @@ const AI = new OpenAI({
 const callGeminiWithFallback = async (params) => {
   const apiKey = process.env.GEMINI_API_KEY;
   const userPrompt = params.messages?.find((m) => m.role === "user")?.content || "AI Technology";
-  const topic = userPrompt.replace(/^Write an article about /i, "").trim();
+  const topic = userPrompt
+    .replace(/^Write an article about /i, "")
+    .replace(/\s+in\s+(Short|Medium|Long).*/i, "")
+    .replace(/\s+in\s+\d+.*$/i, "")
+    .trim();
 
   // If valid Gemini key starting with AIzaSy exists, attempt live API call
   if (apiKey && apiKey.startsWith("AIzaSy")) {

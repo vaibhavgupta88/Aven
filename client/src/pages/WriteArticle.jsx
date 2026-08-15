@@ -23,7 +23,7 @@ const WriteArticle = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const prompt = `Write an article about ${input} in ${selectedLength.text}`;
+      const prompt = input.trim();
 
       let token = "";
       try {
