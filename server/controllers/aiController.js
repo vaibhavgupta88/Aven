@@ -315,7 +315,7 @@ const callGeminiWithFallback = async (params) => {
   const apiKey = process.env.GEMINI_API_KEY;
   const userPrompt = params.messages?.find((m) => m.role === "user")?.content || "Artificial Intelligence";
   const userCategory = params.messages?.find((m) => m.role === "user")?.category || "General";
-  const userTargetLength = params.messages?.find((m) => m.role === "user")?.targetLength || 800;
+  const userTargetLength = params.targetLength || params.messages?.find((m) => m.role === "user")?.targetLength || 800;
 
   let cleanTopic = userPrompt
     .replace(/^Generate a blog title for the keyword\s+/i, "")
@@ -404,6 +404,7 @@ export const generateArticle = async (req, res) => {
     const maxTokens = Math.min(4000, Math.max(2000, (Number(length) || 1000) * 2.5));
 
     const response = await callGeminiWithFallback({
+      targetLength: length,
       messages: [
         {
           role: "system",
