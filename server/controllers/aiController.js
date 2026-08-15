@@ -150,7 +150,12 @@ As technology advances, integrating ${cleanTopic} into day-to-day operations wil
 4. Master ${cleanTopic}: Top Strategies for Success
 5. Why ${cleanTopic} Matters Now More Than Ever`;
 
-  const isBlogTitle = params.messages?.some((m) => m.content?.toLowerCase().includes("blog title"));
+  const isBlogTitle = params.messages?.some(
+    (m) =>
+      m.content?.toLowerCase().includes("blog title") ||
+      m.content?.toLowerCase().includes("blog post titles") ||
+      m.content?.toLowerCase().includes("copywriter")
+  );
   const isResumeReview = params.messages?.some((m) =>
     m.content?.toLowerCase().includes("ats resume") ||
     m.content?.toLowerCase().includes("resume")
