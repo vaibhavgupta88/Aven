@@ -4,8 +4,6 @@ import { Check, Loader2, CreditCard } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
-
 const Plan = () => {
   const { user } = useUser();
   const { getToken } = useAuth();
