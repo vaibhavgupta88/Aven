@@ -96,14 +96,16 @@ const callGeminiWithFallback = async (params) => {
   const userPrompt = params.messages?.find((m) => m.role === "user")?.content || "Artificial Intelligence";
   
   let cleanTopic = userPrompt
+    .replace(/^Generate a blog title for the keyword\s+/i, "")
+    .replace(/\s+in the category\s+.*$/i, "")
+    .replace(/^Write an article about\s+/i, "")
     .replace(/^Review the following resume.*/is, "")
-    .replace(/^Write an article about /i, "")
     .replace(/\s+in\s+(Short|Medium|Long).*/i, "")
     .replace(/\s+in\s+\d+.*$/i, "")
     .trim();
 
-  if (!cleanTopic || cleanTopic.length > 60 || cleanTopic.toLowerCase().includes("resume")) {
-    cleanTopic = "Artificial Intelligence";
+  if (!cleanTopic) {
+    cleanTopic = "General Topic";
   }
 
   const topic = cleanTopic;

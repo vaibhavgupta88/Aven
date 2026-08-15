@@ -29,7 +29,7 @@ const BlogTitles = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const prompt = `Generate a blog title for the keyword ${input} in the category ${selectedCategory}`;
+      const prompt = input.trim();
 
       let token = "";
       try {
