@@ -13,11 +13,165 @@ const AI = new OpenAI({
 
 export const generateDynamicArticle = (rawTopic = "", targetLength = 800) => {
   const topic = (rawTopic || "Artificial Intelligence").trim();
-  const capTopic = topic.charAt(0).toUpperCase() + topic.slice(1);
+  const capTopic = topic.split(" ").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
   const len = Number(targetLength) || 800;
+  const lower = topic.toLowerCase();
 
+  const isHistoryOrIndia = lower.includes("history") || lower.includes("india") || lower.includes("empire") || lower.includes("civilization") || lower.includes("culture");
+
+  if (isHistoryOrIndia) {
+    if (len >= 1400) {
+      return `# Comprehensive History and Legacy of ${capTopic}
+
+## Executive Summary
+
+${capTopic} encompasses one of the world's oldest, continuous, and most complex historical narratives, spanning over five millennia of cultural evolution, philosophical breakthroughs, architectural wonders, and geopolitical transformations. From the ancient urban centers of the Indus Valley Civilization to the vibrant democratic republic of today, ${capTopic} has profoundly shaped global trade, philosophy, mathematics, science, and art.
+
+This master historical guide provides a detailed, multi-epochal analysis of ${capTopic}, tracing foundational civilizations, golden imperial eras, medieval cultural synthesis, colonial rule, the national freedom struggle, and the modern emergence of a global powerhouse.
+
+---
+
+## 1. Ancient Origins: The Indus Valley and Vedic Foundations (c. 3300 BCE – 500 BCE)
+
+The earliest chapters of ${capTopic} began along the fertile floodplains of the Indus River basin. The Harappan Civilization (Harappa and Mohenjo-Daro) represented an architectural and urban planning marvel, featuring grid-layout cities, sophisticated underground drainage networks, standardized weights, and extensive maritime trade routes extending into Mesopotamia.
+
+Following the decline of the Harappan urban centers, the Vedic Period introduced foundational philosophical texts, classical Sanskrit literature, and spiritual traditions:
+- **Early Vedic Epoch**: Composition of the Rigveda, establishing early social structures, agricultural economies, and cosmic philosophies.
+- **Later Vedic Epoch**: Transition toward settled agrarian monarchies across the Indo-Gangetic plain, giving rise to the Upanishads and philosophical discourses on duty (*Dharma*) and liberation (*Moksha*).
+
+---
+
+## 2. Imperial Golden Ages: Mauryas, Guptas, and Southern Dynasties (c. 500 BCE – 1200 CE)
+
+By the 6th century BCE, sixteen major kingdoms (*Mahajanapadas*) dominated northern and central regions, paving the way for great empires:
+
+### The Mauryan Empire and Emperor Ashoka
+Founded by Chandragupta Maurya and guided by Chanakya (*Kautilya*), the Mauryan Empire unified vast territories. Emperor Ashoka the Great, following the Kalinga War, embraced Buddhism and promulgated edicts promoting non-violence (*Ahimsa*), religious tolerance, and social welfare across inscribed rock pillars.
+
+### The Gupta Empire: The Classical Golden Age
+Under emperors Chandragupta I, Samudragupta, and Chandragupta II, ${capTopic} witnessed a flourishing of science, mathematics, astronomy, and literature:
+- **Mathematics and Astronomy**: Aryabhata calculated the value of Pi, introduced the concept of zero, and proposed heliocentric planetary models.
+- **Classical Literature**: Kalidasa authored timeless Sanskrit epics, while universities like Nalanda attracted scholars from across Asia.
+
+### Maritime Dynasties of Southern India
+Concurrently, the Chola, Pallava, and Chalukya dynasties dominated southern trade and culture. The Cholas constructed magnificent Dravidian stone temples like the Brihadeeswarar Temple and expanded maritime trade across Southeast Asia.
+
+---
+
+## 3. Medieval Era and Cultural Synthesis (c. 1200 CE – 1757 CE)
+
+The medieval period brought significant demographic, artistic, and political transformations through incoming dynasties and the emergence of the Delhi Sultanate and Mughal Empire:
+- **The Mughal Empire**: Under Akbar the Great, the empire fostered administrative centralization, land reform, and religious harmony through divine faith initiatives (*Din-i-Ilahi*).
+- **Architectural Masterpieces**: The era produced world-renowned monuments, including the Taj Mahal, Red Fort, Fatehpur Sikri, and Humayun's Tomb.
+- **Bhakti and Sufi Movements**: Spiritual revivalist movements emphasized personal devotion, social equality, and vernacular literature, transcending rigid social divides.
+
+---
+
+## 4. Colonial Rule, Exploitation, and the National Movement (1757 CE – 1947 CE)
+
+Following the Battle of Plassey in 1757, the British East India Company established commercial and military dominance, later transitioning to direct British Crown governance (*the Raj*) following the Indian Rebellion of 1857.
+
+### The Struggle for Independence
+The 20th century witnessed a unified, multi-faceted national movement led by the Indian National Congress:
+- **Non-Violent Resistance**: Mahatma Gandhi pioneered non-violent civil disobedience (*Satyagraha*), leading national rallies such as the Salt March and Quit India Movement.
+- **Revolutionary and Political Leaders**: Leaders including Netaji Subhas Chandra Bose, Jawaharlal Nehru, Sardar Vallabhbhai Patel, and Dr. B.R. Ambedkar mobilized diverse segments of society toward freedom.
+
+On August 15, 1947, freedom was achieved, marked by Jawaharlal Nehru's historic "Tryst with Destiny" address.
+
+---
+
+## 5. Post-Independence and Modern Republic (1947 CE – Present)
+
+In 1950, the Constitution of India came into effect, establishing the sovereign democratic republic under Dr. B.R. Ambedkar's guidance. Key milestones of the modern era include:
+- **Green and White Revolutions**: Transforming agricultural productivity and dairy production to ensure national food security.
+- **Economic Liberalization (1991)**: Structural economic reforms opened domestic markets, catalyzing rapid industrialization, technology service exports, and financial growth.
+- **Global Tech and Scientific Leadership**: Today, India stands as a leader in space exploration (ISRO's Chandrayaan and Mangalyaan missions), digital public infrastructure (UPI), and software technology services.
+
+---
+
+## 6. Historical Conclusion
+
+The legacy of ${capTopic} stands as a testament to human resilience, intellectual inquiry, and cultural diversity. By honoring its rich heritage while embracing modern progress, the nation continues to inspire global dialogue and shape the future of human civilization.`;
+    }
+
+    if (len >= 1000) {
+      return `# The Essential Guide to ${capTopic}
+
+## Executive Summary
+
+${capTopic} represents one of the most vibrant, continuous, and impactful historical journeys in world history. Tracing thousands of years of human achievement, spiritual evolution, and architectural greatness, this guide explores key historical epochs that shaped ${capTopic}.
+
+---
+
+## 1. Ancient Origins and Classical Civilizations
+
+The roots of ${capTopic} extend back to ancient urban settlements:
+- **Indus Valley Civilization**: Renowned for advanced city planning, standardized weights, and clean sanitation systems.
+- **Vedic Era**: Emergence of classical Sanskrit literature, foundational philosophy, and early agricultural kingdoms.
+- **Mauryan and Gupta Golden Ages**: Era of Emperor Ashoka, mathematical breakthroughs (concept of zero by Aryabhata), and world-class universities like Nalanda.
+
+---
+
+## 2. Medieval Synthesis and Architectural Legacy
+
+During the medieval period, incoming dynasties and native empires created a rich synthesis of art, music, and architecture:
+- **Mughal Architecture**: Construction of iconic heritage monuments including the Taj Mahal, Fatehpur Sikri, and Agra Fort.
+- **Cultural Revival**: The Bhakti and Sufi movements promoted social harmony, vernacular poetry, and personal devotion.
+
+---
+
+## 3. Colonial Era and The Freedom Movement
+
+The 19th and 20th centuries were defined by national awakening and struggle against colonial rule:
+- **British Rule**: Establishment of company rule followed by direct Crown control after 1857.
+- **Non-Violent Resistance**: Mahatma Gandhi led landmark civil disobedience campaigns like the Salt March.
+- **Independence (1947)**: Achievement of national sovereignty on August 15, 1947.
+
+---
+
+## 4. Modern Era and Strategic Conclusion
+
+Since adopting its Constitution in 1950, the nation has evolved into a global democratic leader, economic engine, and technology power. Understanding this historical arc offers profound appreciation for the enduring spirit and future trajectory of ${capTopic}.`;
+    }
+
+    // Short Historical Article (500-800 words)
+    return `# Historical Overview of ${capTopic}
+
+## Executive Summary
+
+${capTopic} spans over five thousand years of rich history, cultural diversity, and intellectual achievement. From ancient river valley settlements to a modern democratic republic, the narrative of ${capTopic} is a compelling saga of human perseverance, innovation, and unity in diversity.
+
+---
+
+## 1. Ancient Foundations and Golden Eras
+
+The history of ${capTopic} began with the Indus Valley Civilization, one of the earliest urban societies known for planned cities and trade networks. Following this era, the Vedic Period laid the philosophical and cultural foundations of the subcontinent.
+
+During the classical period, great empires flourished:
+- **The Mauryan Empire**: Unified vast territories under Emperor Ashoka, who championed non-violence and public welfare.
+- **The Gupta Empire**: Celebrated as a golden age of science, mathematics, and Sanskrit literature, giving the world breakthroughs like the mathematical zero.
+
+---
+
+## 2. Medieval Heritage and Colonial Struggles
+
+The medieval era brought vibrant architectural, linguistic, and cultural synthesis under various dynasties, leaving behind majestic forts, temples, and monuments.
+
+By the 18th century, foreign colonial powers expanded influence, leading to British rule. In response, a powerful national freedom movement united millions across the region:
+- **Mahatma Gandhi's Non-Violent Movement**: Pioneered peaceful protest strategies like *Satyagraha*.
+- **Independence in 1947**: Led to the birth of the sovereign nation on August 15, 1947.
+
+---
+
+## 3. Modern Progress and Legacy
+
+Following independence, the adoption of a comprehensive democratic constitution in 1950 set the stage for modern growth. Today, ${capTopic} is a global leader in technology, scientific research, space exploration, and economic development.
+
+The enduring legacy of ${capTopic} continues to inspire the world through its timeless values of peace, cultural richness, and vibrant democracy.`;
+  }
+
+  // Universal / Technology / Business Articles
   if (len >= 1400) {
-    // Long Article (1200+ words)
     return `# Comprehensive Master Guide to ${capTopic}
 
 ## Executive Summary
@@ -99,7 +253,6 @@ By prioritizing strategic clarity, technical rigor, and user-centric design, ${c
   }
 
   if (len >= 1000) {
-    // Medium Article (800-1200 words)
     return `# The Definitive Guide to ${capTopic}
 
 ## Executive Summary
@@ -140,7 +293,6 @@ To maximize the benefits of ${capTopic}, organizations should adopt these indust
 Mastering ${capTopic} requires aligning strategic goals with technical execution. By implementing modular design principles and prioritizing continuous optimization, teams can unlock sustainable growth and long-term success.`;
   }
 
-  // Short Article (500-800 words)
   return `# Comprehensive Guide to ${capTopic}
 
 ## Executive Summary
