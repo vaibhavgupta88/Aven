@@ -13,12 +13,18 @@ const AI = new OpenAI({
 
 const callGeminiWithFallback = async (params) => {
   const apiKey = process.env.GEMINI_API_KEY;
-  const userPrompt = params.messages?.find((m) => m.role === "user")?.content || "AI Technology";
-  const topic = userPrompt
+  const userPrompt = params.messages?.find((m) => m.role === "user")?.content || "Artificial Intelligence";
+  
+  let cleanTopic = userPrompt
+    .replace(/^Review the following resume.*/is, "")
     .replace(/^Write an article about /i, "")
     .replace(/\s+in\s+(Short|Medium|Long).*/i, "")
     .replace(/\s+in\s+\d+.*$/i, "")
     .trim();
+
+  if (!cleanTopic || cleanTopic.length > 60 || cleanTopic.toLowerCase().includes("resume")) {
+    cleanTopic = "Artificial Intelligence";
+  }
 
   // If valid Gemini key starting with AIzaSy exists, attempt live API call
   if (apiKey && apiKey.startsWith("AIzaSy")) {
@@ -36,9 +42,9 @@ const callGeminiWithFallback = async (params) => {
   }
 
   // Graceful fallback generator if key is invalid, missing, or rate-limited
-  const fallbackArticle = `# Exploring ${topic}
+  const fallbackArticle = `# Exploring ${cleanTopic}
 
-${topic} is rapidly revolutionizing the modern digital landscape. From accelerating workflow efficiency to expanding creative horizons, innovative applications of this field are empowering professionals across diverse industries.
+${cleanTopic} is rapidly revolutionizing the modern digital landscape. From accelerating workflow efficiency to expanding creative horizons, innovative applications of this field are empowering professionals across diverse industries.
 
 ## Key Highlights & Innovations
 
@@ -103,8 +109,11 @@ As technology advances, integrating ${topic} into day-to-day operations will con
 2. **Inject Missing Technical Keywords**: Add a dedicated "Technical Skills" section grouped into categories: *Languages*, *Frameworks*, *Databases & Cloud*, *Tools*.
 3. **Refine Executive Summary**: Craft a punchy 3-line professional summary highlighting your core expertise and top achievements at the top of your resume.`;
 
-  const isBlogTitle = params.messages?.some((m) => m.content?.includes("blog title"));
-  const isResumeReview = params.messages?.some((m) => m.content?.includes("ATS resume reviewer"));
+  const isBlogTitle = params.messages?.some((m) => m.content?.toLowerCase().includes("blog title"));
+  const isResumeReview = params.messages?.some((m) =>
+    m.content?.toLowerCase().includes("ats resume") ||
+    m.content?.toLowerCase().includes("resume")
+  );
 
   let content = fallbackArticle;
   if (isBlogTitle) content = fallbackBlogTitles;
