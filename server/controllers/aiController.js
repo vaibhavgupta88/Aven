@@ -106,6 +106,8 @@ const callGeminiWithFallback = async (params) => {
     cleanTopic = "Artificial Intelligence";
   }
 
+  const topic = cleanTopic;
+
   // If valid Gemini key starting with AIzaSy exists, attempt live API call
   if (apiKey && apiKey.startsWith("AIzaSy")) {
     const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
