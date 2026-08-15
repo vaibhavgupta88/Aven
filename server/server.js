@@ -126,7 +126,8 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3000;
 
-if (process.env.NODE_ENV !== "production") {
+// Listen on all platforms (Render, Railway, VPS, Local) except Vercel serverless functions
+if (process.env.VERCEL !== "1") {
   app.listen(PORT, "0.0.0.0", () => {
     console.log(
       `Server is running on port ${PORT} => http://localhost:${PORT} 🍽️`
