@@ -2,6 +2,7 @@ import sql from "../configs/db.js";
 import {
   getCreationsByUser,
   getAllCreations,
+  getPublishedMemoryCreations,
   removeCreation,
 } from "../configs/creationsStore.js";
 
@@ -50,10 +51,14 @@ export const getPublishedCreations = async (req, res) => {
       console.warn("DB query note:", e.message);
     }
 
-    const memoryCreations = getAllCreations();
+    const memoryCreations = getPublishedMemoryCreations();
     const combinedMap = new Map();
     [...(Array.isArray(dbCreations) ? dbCreations : []), ...memoryCreations].forEach(
-      (item) => combinedMap.set(item.id, item)
+      (item) => {
+        if (item.publish === true) {
+          combinedMap.set(item.id, item);
+        }
+      }
     );
 
     const creations = Array.from(combinedMap.values());

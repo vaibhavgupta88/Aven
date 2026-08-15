@@ -1,13 +1,14 @@
 // In-memory fallback store for user creations when Postgres DB is paused/unconfigured
 const inMemoryCreations = [];
 
-export const saveCreation = (userId, prompt, content, type) => {
+export const saveCreation = (userId, prompt, content, type, publish = false) => {
   const newCreation = {
     id: `creation_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
     user_id: userId,
     prompt,
     content,
     type,
+    publish: Boolean(publish),
     likes: [],
     created_at: new Date().toISOString(),
   };
@@ -23,6 +24,10 @@ export const getCreationsByUser = (userId) => {
 
 export const getAllCreations = () => {
   return inMemoryCreations;
+};
+
+export const getPublishedMemoryCreations = () => {
+  return inMemoryCreations.filter((item) => item.publish === true);
 };
 
 export const removeCreation = (id, userId) => {

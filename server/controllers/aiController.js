@@ -236,7 +236,7 @@ export const generateImage = async (req, res) => {
       console.warn("Clipdrop/Cloudinary note:", apiErr.message);
     }
 
-    saveCreation(userId, prompt, secure_url, "image");
+    saveCreation(userId, prompt, secure_url, "image", publish ?? false);
 
     try {
       await sql` INSERT INTO creations (user_id, prompt, content, type, publish) VALUES (${userId}, ${prompt}, ${secure_url}, 'image', ${publish ?? false}) `;
